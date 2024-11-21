@@ -12,7 +12,7 @@ def create_navibar():
                         [
                             dbc.NavItem(dbc.NavLink("Dashboard", href="/", className="nav-link")),
                             dbc.NavItem(dbc.NavLink("Data Exploration", href="/exploration", className="nav-link")),
-                            dbc.NavItem(dbc.NavLink("About", href="/about", className="nav-link")),
+                            dbc.NavItem(dbc.NavLink("About", href="#", className="nav-link", id="about-link")),
                         ],
                         className="ms-auto",
                         navbar=True,
@@ -22,6 +22,7 @@ def create_navibar():
                 ),
             ],
         ),
-        color="#f8f9fa",
+        color="dark",
+        dark=True,
         sticky="top",
     )
