@@ -8,6 +8,8 @@ def create_sidebar():
                dcc.Link("Home", href="/", className="sidebar-link"),
                html.Br(),
                dcc.Link("About", href="/about", className="sidebar-link"),
+               html.Br(),
+               dcc.Link("Data Exploration", href="/data-exploration", className="sidebar-link"),
 
           ],
           className="sidebar"
