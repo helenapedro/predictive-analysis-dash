@@ -1,0 +1,52 @@
+/* Main container for responsive layout */
+.main-container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+/* Sidebar styling */
+.sidebar {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.sidebar-link {
+  display: block;
+  margin: 1rem 0;
+  text-decoration: none;
+  color: #007bff;
+}
+
+.sidebar-link:hover {
+  text-decoration: underline;
+}
+
+/* Page content styling */
+.content {
+  flex-grow: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Responsive layout for mobile */
+@media screen and (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+}
