@@ -32,9 +32,11 @@ def toggle_summary(n_clicks):
     [Input("url", "pathname")],
 )
 def display_page(pathname):
-    if pathname == "/":
+     if pathname == "/":
         return create_home_page()
-    elif pathname == "/about":
+     elif pathname == "/about":
         return create_about_page()
-    else:
+     elif pathname == "/data-exploration":
+        return create_about_page()
+     else:
         return html.H1("404: Page Not Found", className="error")
