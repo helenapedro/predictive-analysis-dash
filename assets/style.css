@@ -75,6 +75,7 @@ button:hover {
 
   .sidebar {
     font-size: 16px; /* Adjust sidebar font size */
+    background-color: "#f8f9fa";
   }
 
   button {

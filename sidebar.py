@@ -17,14 +17,5 @@ def create_sidebar():
             ),
         ],
         className="bg-light border-right p-3", 
-        style={
-            "position": "fixed",
-            "top": 0,
-            "left": 0,
-            "bottom": 0,
-            "width": "18rem",
-            "padding": "2rem 1rem",
-            "background-color": "#f8f9fa",
-            "overflow": "auto",
-        }
+        style= "sidebar",
     )
