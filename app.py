@@ -2,6 +2,7 @@ from dash import Dash, html, dcc, Input, Output
 from sidebar import create_sidebar
 from pages.home import create_home_page
 from pages.about import create_about_page
+from pages.data_exploration import create_exploration_page
 
 app = Dash(__name__)
 
@@ -36,7 +37,7 @@ def display_page(pathname):
         return create_home_page()
      elif pathname == "/about":
         return create_about_page()
-     elif pathname == "/data-exploration":
-        return create_about_page()
+     elif pathname == "/exploration":
+        return create_exploration_page()
      else:
         return html.H1("404: Page Not Found", className="error")
