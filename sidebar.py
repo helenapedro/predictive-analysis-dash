@@ -1,21 +1,27 @@
-from dash import html, dcc
+from dash import html
 import dash_bootstrap_components as dbc
 
-def create_sidebar():
-    return html.Div(
-        [
-            html.H2("Rocket Launch Prediction Analysis", className="display-4"),
-            html.Hr(),
-            dbc.Nav(
-                [
-                    dbc.NavLink("Dashboard", href="/", className="nav-link"),
-                    dbc.NavLink("Data Exploration", href="/exploration", className="nav-link"),
-                    dbc.NavLink("About", href="/about", className="nav-link"),
-                ],
-                vertical=True,
-                pills=True,
-            ),
-        ],
-        className="bg-light border-right p-3", 
-        style= "sidebar",
+def create_navibar():
+    return dbc.Navbar(
+        dbc.Container(
+            [
+                dbc.NavbarBrand("Rocket Launch Prediction Analysis", className="ms-2"),
+                dbc.NavbarToggler(id="navbar-toggler"),
+                dbc.Collapse(
+                    dbc.Nav(
+                        [
+                            dbc.NavItem(dbc.NavLink("Dashboard", href="/", className="nav-link")),
+                            dbc.NavItem(dbc.NavLink("Data Exploration", href="/exploration", className="nav-link")),
+                            dbc.NavItem(dbc.NavLink("About", href="/about", className="nav-link")),
+                        ],
+                        className="ms-auto",
+                        navbar=True,
+                    ),
+                    id="navbar-collapse",
+                    navbar=True,
+                ),
+            ],
+        ),
+        color="#f8f9fa",
+        sticky="top",
     )
