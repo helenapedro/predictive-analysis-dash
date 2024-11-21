@@ -11,6 +11,9 @@ app = Dash(
 
 server = app.server
 
+app.config.suppress_callback_exceptions = True
+
+
 # Placeholder elements for callbacks
 hidden_elements = html.Div(
     [
@@ -25,7 +28,7 @@ app.layout = html.Div(
         create_sidebar(),
         dcc.Location(id="url"), 
         html.Div(id="page-content", className="content"),
-        hidden_elements,  # Include hidden elements for callback registration
+        hidden_elements,
     ],
     className="main-container",
 )

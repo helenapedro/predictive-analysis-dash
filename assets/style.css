@@ -1,18 +1,22 @@
 /* Base styles for larger screens */
 .main-container {
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
   padding: 20px;
 }
 
 .sidebar {
   width: 250px;
-  background-color: #333;
-  color: white;
+  background-color: #b6d2ef;
+  color: black;
   padding: 15px;
   position: fixed;
   height: 100%;
   overflow: auto;
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .content {
