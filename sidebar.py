@@ -5,11 +5,11 @@ def create_sidebar():
           [
                html.H2("Rocket Launch Prediction Analysis", className="sidebar-title"),
                html.Hr(),
-               dcc.Link("Home", href="/", className="sidebar-link"),
-               html.Br(),
-               dcc.Link("About", href="/about", className="sidebar-link"),
+               dcc.Link("Dashboard", href="/", className="sidebar-link"),
                html.Br(),
                dcc.Link("Data Exploration", href="/exploration", className="sidebar-link"),
+               html.Br(),
+               dcc.Link("About", href="/about", className="sidebar-link"),
 
           ],
           className="sidebar"
