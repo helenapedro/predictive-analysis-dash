@@ -2,7 +2,7 @@ from dash import Dash, html, dcc, Input, Output
 from sidebar import create_sidebar
 from pages.home import create_home_page
 from pages.about import create_about_page
-from pages.data_exploration import create_exploration_page
+from pages.data_exploration import create_exploration_page, fetch_and_process_data
 
 app = Dash(
     __name__,
@@ -13,6 +13,8 @@ server = app.server
 
 app.config.suppress_callback_exceptions = True
 
+# Fetch and preprocess data once at the start of the app
+rockets_df, launchpads_df, payloads_df, cores_df = fetch_and_process_data()
 
 # Placeholder elements for callbacks
 hidden_elements = html.Div(
@@ -54,7 +56,8 @@ def display_page(pathname):
     elif pathname == "/about":
         return create_about_page()
     elif pathname == "/exploration":
-        return create_exploration_page()
+        # Pass the preprocessed data to the exploration page
+        return create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df)
     else:
         return html.H1("404: Page Not Found", className="error")
 
