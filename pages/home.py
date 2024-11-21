@@ -9,7 +9,7 @@ def create_home_page():
     return dbc.Container([
         html.Div(children=[
             html.H1('Launch Records Dashboard',
-                    style={'textAlign': 'center', 'color': '#503D36', 'font-size': 40}),
+                    style={'textAlign': 'center', 'padding': '20px', 'color': '#4CAF50'}),
         ]),
         html.Br(),
         dbc.Row([
@@ -19,7 +19,7 @@ def create_home_page():
                             value='ALL',
                             placeholder="State",
                             searchable=True),
-            ], width=6)
+            ],  width=6)
         ]),
         html.Br(),
         dbc.Row([
@@ -37,7 +37,7 @@ def create_home_page():
             marks={0: '0', 1000: '1000'},
             value=get_payload_range()
         ),
-    ], className="page-content",)
+    ], className="container mt-5",)
 
 @callback(Output(component_id='success-pie-chart', component_property='figure'),
               Input(component_id='site-dropdown', component_property='value'))
