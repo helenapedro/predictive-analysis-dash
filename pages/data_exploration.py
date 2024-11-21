@@ -19,7 +19,9 @@ cores_df = pd.DataFrame(cores_data)
 
 # Define a function to convert unsupported data types
 def convert_df_types(df):
-    return df.map(lambda x: x if isinstance(x, (str, int, float, bool)) else str(x))
+    if isinstance(df, pd.DataFrame):
+        return df.applymap(lambda x: x if isinstance(x, (str, int, float, bool)) else str(x))
+    raise ValueError("Input is not a valid DataFrame")
 
 # Convert DataFrames using the function
 rockets_df = convert_df_types(rockets_df)
@@ -56,7 +58,7 @@ cores_df = cores_df.rename(columns={
 })
 
 def create_exploration_page():
-     return html.Div (
+     return (
           html.H1('Data Exploration', style={'textAlign': 'center'}),
           dcc.Tabs([
                dcc.Tab(label='Rockets', children=[
@@ -100,17 +102,19 @@ def create_exploration_page():
                          id='payload-mass-distribution',
                          figure={
                               'data': [
-                              {
-                                   'x': payloads_df['name'],
-                                   'y': payloads_df['mass_kg'],
-                                   'type': 'bar',
-                                   'name': 'Mass (kg)',
-                              },
+                                   {
+                                        'x': payloads_df['name'],
+                                        'y': payloads_df['mass_kg'],
+                                        'type': 'bar',
+                                        'marker': {'color': 'blue'},  # Add color
+                                        'name': 'Mass (kg)',
+                                   },
                               ],
                               'layout': {
-                              'title': 'Payload Mass Distribution',
-                              'xaxis': {'title': 'Payload Name'},
-                              'yaxis': {'title': 'Mass (kg)'},
+                                   'title': {'text': 'Payload Mass Distribution', 'x': 0.5},  # Center title
+                                   'xaxis': {'title': 'Payload Name', 'automargin': True},  # Auto margins
+                                   'yaxis': {'title': 'Mass (kg)', 'automargin': True},
+                                   'template': 'plotly_dark',  # Dark theme
                               }
                          }
                     )
