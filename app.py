@@ -1,32 +1,44 @@
-import dash
-from dash import dcc, html
+from dash import Dash, html, dcc, Input, Output, callback
+from sidebar import create_sidebar
+from pages.home import create_home_page
+from pages.about import create_about_page
+from pages.other_page import create_other_page
+
+app = Dash(_name_, use_pages=True)
+server = app.server  # Required for deployment
+
+# App Layout
+app.layout = html.Div(
+    [
+        create_sidebar(),
+        dcc.Location(id="url"),
+        html.Div(id="page-content", className="content"),
+    ],
+    className="main-container",
+)
+
+# Page Navigation
+@app.callback(
+    Output("page-content", "children"),
+    [Input("url", "pathname")],
+)
+def display_page(pathname):
+    if pathname == "/":
+        return create_home_page()
+    elif pathname == "/about":
+        return create_about_page()
+    elif pathname == "/other-page":
+        return create_other_page()
+    else:
+        return html.H1("404: Page Not Found", className="error")
+
 from dash.dependencies import Input, Output
-import plotly.express as px
-import pandas as pd
-
-df = px.data.iris()
-
-app = dash.Dash(__name__)
-server = app.server 
-
-# Layout
-app.layout = html.Div([
-    html.H1("Iris Dataset Visualization"),
-    dcc.Dropdown(
-        id="feature-dropdown",
-        options=[{"label": col, "value": col} for col in df.columns if df[col].dtype != 'object'],
-        value="sepal_width"
-    ),
-    dcc.Graph(id="scatter-plot"),
-])
 
 @app.callback(
-    Output("scatter-plot", "figure"),
-    [Input("feature-dropdown", "value")]
+    Output("summary-content", "style"),
+    [Input("toggle-button", "n_clicks")],
 )
-def update_plot(selected_feature):
-    fig = px.scatter(df, x="sepal_length", y=selected_feature, color="species")
-    return fig
-
-if __name__ == "_main_":
-    app.run_server(debug=True)
+def toggle_summary(n_clicks):
+    if n_clicks % 2 == 1:
+        return {"display": "block"}
+    return {"display": "none"}   
