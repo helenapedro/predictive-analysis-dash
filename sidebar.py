@@ -22,7 +22,6 @@ def create_navibar():
                 ),
             ],
         ),
-        color="dark",
-        dark=True,
+        color="#f8f9fa",
         sticky="top",
     )
