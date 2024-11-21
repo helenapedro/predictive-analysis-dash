@@ -1,52 +1,80 @@
-/* Main container for responsive layout */
+/* Base styles for larger screens */
 .main-container {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  padding: 20px;
 }
 
-/* Sidebar styling */
 .sidebar {
-  background-color: #f8f9fa;
-  padding: 1rem;
   width: 250px;
-  flex-shrink: 0;
+  background-color: #333;
+  color: white;
+  padding: 15px;
+  position: fixed;
+  height: 100%;
+  overflow: auto;
 }
 
-.sidebar-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.sidebar-link {
-  display: block;
-  margin: 1rem 0;
-  text-decoration: none;
-  color: #007bff;
-}
-
-.sidebar-link:hover {
-  text-decoration: underline;
-}
-
-/* Page content styling */
 .content {
-  flex-grow: 1;
-  padding: 2rem;
-  overflow-y: auto;
+  margin-left: 260px;
+  padding: 20px;
 }
 
-/* Responsive layout for mobile */
-@media screen and (max-width: 768px) {
-  .main-container {
-    flex-direction: column;
-  }
+/* Buttons */
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
 
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Error page */
+.error {
+  text-align: center;
+  color: red;
+}
+
+/* Responsive styles for screens smaller than 768px */
+@media screen and (max-width: 768px) {
   .sidebar {
     width: 100%;
+    height: auto;
+    position: relative; /* Sidebar moves to the top */
   }
 
   .content {
-    padding: 1rem;
+    margin-left: 0; /* Remove the margin for small screens */
+    padding: 10px;
+  }
+
+  button {
+    width: 100%; /* Buttons take full width */
+    padding: 12px;
+    font-size: 16px;
+  }
+}
+
+/* Additional styles for very small screens (< 480px) */
+@media screen and (max-width: 480px) {
+  .main-container {
+    padding: 10px;
+  }
+
+  .content {
+    font-size: 14px; /* Reduce font size for smaller screens */
+  }
+
+  .sidebar {
+    font-size: 16px; /* Adjust sidebar font size */
+  }
+
+  button {
+    font-size: 14px;
+    padding: 10px;
   }
 }
