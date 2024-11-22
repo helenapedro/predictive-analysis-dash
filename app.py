@@ -1,4 +1,5 @@
 from dash import Dash, html, dcc, Input, Output, State
+import dash
 import dash_bootstrap_components as dbc
 from sidebar import create_navibar
 from pages.home import create_home_page
@@ -25,20 +26,24 @@ app.layout = html.Div(
         html.Div(id="page-content", className="content"),
         html.Div(
             [
-                dbc.Button("Close", id="close-sidebar", className="btn btn-danger"),
-                create_about_content()
+                create_about_content(),
+                dbc.Button(
+                    "Close", 
+                    id="close-sidebar", 
+                    className="btn btn-danger mt-3",
+                ),
             ],
             id="about-sidebar",
             className="sidebar bg-light border-left p-3",
             style={
                 "position": "fixed",
                 "top": 0,
-                "right": "-350px",
+                "left": "-320px",
                 "bottom": 0,
-                "width": "350px",
+                "width": "320px",
                 "padding": "2rem 1rem",
                 "overflow": "auto",
-                "transition": "right 0.4s ease-in-out",
+                "transition": "left 0.4s ease-in-out",
             }
         ),
     ],
@@ -63,17 +68,23 @@ def toggle_navbar(n_clicks, is_open):
     [State("about-sidebar", "style")],
 )
 def toggle_about_sidebar(n_about_clicks, n_close_clicks, sidebar_style):
-    if n_about_clicks or n_close_clicks:
-        if sidebar_style["right"] == "0px":
-            sidebar_style["right"] = "-350px"
-        else:
-            sidebar_style["right"] = "0px"
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        return sidebar_style
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if button_id == "about-link": 
+        return {**sidebar_style, "left": "0px"} 
+    elif button_id == "close-sidebar": 
+        return {**sidebar_style, "left": "-320px"} 
     return sidebar_style
 
 # Dynamic callback for the toggle button
 @app.callback(
-    Output("summary-content-sidebar", "style"),  # Updated ID for sidebar summary content
-    [Input("toggle-button-sidebar", "n_clicks")],  # Updated ID for sidebar toggle button
+    Output("summary-content", "style"),  # Updated ID for sidebar summary content
+    [Input("toggle-button", "n_clicks")],  # Updated ID for sidebar toggle button
 )
 def toggle_summary(n_clicks):
     if n_clicks and n_clicks % 2 == 1:
