@@ -43,13 +43,21 @@ def fetch_static_data_from_api(endpoint):
 def fetch_rocket_launch_data():
     return fetch_static_data_from_api('API_call_spacex_api.json')
 
-rockets_data = fetch_rocket_launch_data()
-BoosterVersion = []
+rockets__launch = fetch_rocket_launch_data()
+rockets_data = fetch_rockets_data()
+rocket_id_to_name = {rocket['id']: rocket['name'] for rocket in rockets_data}
 
-def getBoosterVersion(rockets_data):
+
+""" def getBoosterVersion(rockets_data):
     global BoosterVersion
     BoosterVersion = [item['rocket'].get('rocket_name', 'Unknown') for item in rockets_data]
+    return BoosterVersion """
+
+def getBoosterVersion(rockets_data, rockets_mapping):
+    global BoosterVersion
+    BoosterVersion = [rockets_mapping.get(item['rocket'], 'Unknown') for item in rockets_data]
     return BoosterVersion
+
 
 
 if rockets_data: 
@@ -61,7 +69,7 @@ if rockets_data:
     print(df.dtypes)
     print(df.head)
     print(df) """
-    print(df.columns)
-    print(df['rocket'])
+    """ print(df.columns) """
+    """ print(df['rocket']) """
 else: 
     print("No data to display")

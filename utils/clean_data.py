@@ -159,7 +159,7 @@ data_falcon9.loc[:, 'FlightNumber'] = list(range(1, data_falcon9.shape[0] + 1))
 def create_clean_data(data):
     return html.Div(
         [
-            html.H1('Data Wrangling', style={'textAlign': 'center', 'padding': '20px'}),
+            html.H1('Data Wrangling', style={'textAlign': 'center', 'padding': '20px'}), 
 
             # Add a DataTable for the cleaned data
             html.Div(
