@@ -5,6 +5,9 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.data import fetch_rockets_data, fetch_launchpads_data, fetch_payloads_data, fetch_cores_data
+from utils.clean_data import create_clean_data, fetch_and_clean_launch_data
+
+launch_data = fetch_and_clean_launch_data()
 
 def fetch_and_process_data():
 
@@ -62,6 +65,7 @@ def fetch_and_process_data():
         convert_df_types(payloads_df),
         convert_df_types(cores_df),
     )
+
 # Prepare style dictionaries for DataTable consistency
 style_table = {'overflowX': 'scroll'}
 style_cell = {
@@ -191,6 +195,7 @@ def fetch_cores_data(): return fetch_data_from_api('cores')
                     ]),
                 ],
             ),
+            create_clean_data(launch_data)
         ],
         className="container mt-5",
     )
