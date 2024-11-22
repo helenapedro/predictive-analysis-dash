@@ -42,11 +42,21 @@ def fetch_and_clean_data(raw_data):
     data['date'] = pd.to_datetime(data['date_utc']).dt.date
     data = data[data['date'] <= date(2020, 11, 13)]
 
+    """ rocket_id_to_booster_name = {rocket['id']: rocket['name'] for rocket in data['rocket']}
+     # Add booster names to launchpads DataFrame
+    launchpad_booster_names = [
+        rocket_id_to_booster_name.get(launchpad['rockets'][0], 'Unknown Booster') if launchpad['rockets'] else 'No Rockets'
+        for launchpad in data['launchpad']
+    ]
+
+    data['launchpad']['booster_name'] = launchpad_booster_names
+ """
     # Construct a cleaned DataFrame
     cleaned_data = pd.DataFrame({
         'FlightNumber': data['flight_number'],
         'Date': data['date'],
         'Rocket': data['rocket'],
+        'launchpad': data['launchpad'],
         'Core': data['cores'],
         'Payload': data['payloads'],
     })

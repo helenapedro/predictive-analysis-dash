@@ -52,15 +52,16 @@ def getBoosterVersion(rockets_data):
     return BoosterVersion
 
 
-""" if rockets_data: 
+if rockets_data: 
     
     df = pd.DataFrame(rockets_data)  
     pd.set_option('display.max_columns', None) 
 
-    print(df.columns)
+    """ print(df.columns)
     print(df.dtypes)
     print(df.head)
-    print(df)
-    print(df['name'])
+    print(df) """
+    print(df.columns)
+    print(df['rocket'])
 else: 
-    print("No data to display") """
+    print("No data to display")
