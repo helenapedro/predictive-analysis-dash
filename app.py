@@ -103,7 +103,7 @@ def display_page(pathname):
         return create_about_content()
     elif pathname == "/exploration":
         # Pass the preprocessed data to the exploration page
-        return create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df)
+        return create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df,)
     else:
         return html.H1("404: Page Not Found", className="error")
 

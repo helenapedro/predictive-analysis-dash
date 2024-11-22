@@ -25,14 +25,17 @@ def fetch_payloads_data():
 def fetch_cores_data():
     return fetch_data_from_api('cores')
 
-rockets_data = fetch_cores_data()
+def fetch_rocket_launch_data():
+    return fetch_data_from_api('launches/past')
+
+""" rockets_data = fetch_cores_data()
 
 if rockets_data: 
     
     df = pd.DataFrame(rockets_data)  
     pd.set_option('display.max_columns', None) 
     print(df.columns)
-    """ print(df)   """
-    """ print(df['name'])  """
+    print(df)
+    print(df['name'])
 else: 
-    print("No data to display")
+    print("No data to display") """
