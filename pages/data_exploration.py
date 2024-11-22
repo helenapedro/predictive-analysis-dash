@@ -107,7 +107,7 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
             html.Div(
                 [
                     html.Button(
-                        "Show/Hide Snippet Code", 
+                        "Show/Hide Code Snippet", 
                         id="toggle-button", 
                         n_clicks=0,
                         className="btn btn-primary mb-3"
