@@ -57,9 +57,6 @@ def fetch_falcon_9_launch_data():
         if name:
             column_names.append(name)
 
-    # Print column names to verify 'Date' is included
-    print("Column Names:", column_names)
-
     # Create dictionary to hold the scraped data, initializing with empty lists
     launch_dict = {name: [] for name in column_names}
     launch_dict['Flight No.'] = []
@@ -107,8 +104,7 @@ def fetch_falcon_9_launch_data():
 
     # Ensure all columns are the same length
     max_length = max(len(lst) for lst in launch_dict.values() if lst is not None)  # Find the maximum length, excluding None
-    for key, value in launch_dict.items():
-        # Append None (or any placeholder) to lists that are shorter
+    for value in launch_dict.values():
         while len(value) < max_length:
             value.append(None)
 
@@ -116,12 +112,17 @@ def fetch_falcon_9_launch_data():
     df = pd.DataFrame(launch_dict)
     return df
 
-
-
+# Layout definition
 layout = dbc.Container([ 
     html.H1("Falcon 9 and Falcon Heavy Launch Records"),
-    html.Button("Download Scrape Launch Data", id="scrape-button", n_clicks=0),
-    dbc.Col(id="table-container"),
+    html.Button("Scrape Launch Data", id="scrape-button", n_clicks=0),
+    html.Br(),
+    dcc.Loading(
+        
+        id="loading",
+        type="circle",  # You can also use 'dot', 'circle', etc.
+        children=dbc.Col(id="table-container")  # Wrap the table container with a Loading component
+    ),
     dcc.Download(id="download-dataframe-csv")
 ])
 
