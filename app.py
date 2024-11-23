@@ -87,7 +87,7 @@ def toggle_about_sidebar(n_about_clicks, n_close_clicks, sidebar_style):
     [
         Output("summary-content", "style"),
         Output("initial-table-summary", "style"),
-        Output("processed-data-content", "style")
+        Output("processed-data-content", "style"),
     ],
     [
         Input("toggle-button-summary", "n_clicks"),

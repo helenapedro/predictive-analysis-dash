@@ -1,6 +1,3 @@
-# api_description.py
-from dash import html
-
 from utils.description_card import create_description_card
 
 def create_api_fetching_description():
@@ -54,4 +51,10 @@ def create_api_fetching_description():
         def fetch_rocket_launch_data():
             return fetch_data('API_call_spacex_api.json', base_url_type='initial')
         """
-    return create_description_card("toggle-button-summary", "Show/Hide Code Snippet", description_text, code_snippet, "summary-content")
+    return create_description_card(
+        "toggle-button-summary", 
+        "Show/Hide Code Snippet", 
+        description_text, 
+        code_snippet, 
+        "summary-content"
+    )

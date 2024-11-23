@@ -6,6 +6,9 @@ import pandas as pd
 import unicodedata
 import requests
 
+from webscrapping.webscraping_description import create_webscraping_description
+from webscrapping.webscraping_summary import create_webscraping_summary
+
 # Scraping Functions
 def date_time(table_cells):
     return [data_time.strip() for data_time in list(table_cells.strings)][0:2]
@@ -118,14 +121,27 @@ def fetch_falcon_9_launch_data():
 
     return df
 
-
 # Layout definition
 layout = dbc.Container([ 
-    html.H1("Falcon 9 and Falcon Heavy Launch Records"),
-    html.Button("Download Scrape Launch Data", id="scrape-button", n_clicks=0),
-    html.Br(),
-    dbc.Col(id="table-container"),  # Empty initially, filled after data fetch
-    dcc.Download(id="download-dataframe-csv")
+    dbc.Row(
+        dbc.Col(
+            dbc.Card(
+                [
+                    dbc.CardHeader(html.H2("Falcon 9 and Falcon Heavy Launch Records", className="text-center")),
+                    dbc.CardBody(
+                        [
+                            create_webscraping_description(),
+                            create_webscraping_summary(),
+                            html.Button("Download Scrape Launch Data", id="scrape-button", n_clicks=0),
+                            dbc.Col(id="table-container"),  # Empty initially, filled after data fetch
+                            dcc.Download(id="download-dataframe-csv")
+
+                        ]
+                    )
+                ]
+            )
+        )
+    )
 ])
 
 # Dash Callback to update table and handle CSV download
@@ -153,3 +169,23 @@ def update_table(n_clicks):
 
     # Return only the table without download
     return table, None
+
+# Callback to toggle the visibility of the code snippet description
+@callback(
+    Output("webscraping-data-description", "style"),
+    Input("toggle-webscraping-description", "n_clicks"),
+    prevent_initial_call=True
+)
+def toggle_code_snippet_visibility(n_clicks):
+    # Toggle visibility based on the click count (even -> hide, odd -> show)
+    if n_clicks % 2 == 0:
+        return {"display": "none"}
+    else:
+        return {
+            "display": "block",
+            "backgroundColor": "#f4f4f4",
+            "padding": "10px",
+            "borderRadius": "5px",
+            "whiteSpace": "pre-wrap",
+            "overflowX": "scroll",
+        }
