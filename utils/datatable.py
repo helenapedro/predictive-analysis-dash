@@ -1,4 +1,4 @@
-import dash_table
+from dash import dash_table
 
 # Create reusable DataTable component
 def create_data_table(id, columns, data):

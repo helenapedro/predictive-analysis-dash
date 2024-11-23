@@ -1,18 +1,19 @@
 import pandas as pd
-from utils.data import fetch_rockets_data,fetch_launchpads_data, fetch_payloads_data, fetch_cores_data
+from utils.data import fetch_rockets_data,fetch_launchpads_data, fetch_payloads_data, fetch_cores_data, fetch_static_data
 
 def fetch_and_process_data():
-
     rockets_data = fetch_rockets_data()
     launchpads_data = fetch_launchpads_data()
     payloads_data = fetch_payloads_data()
     cores_data = fetch_cores_data()
+    static_data = fetch_static_data()
 
     # Convert to DataFrames
     rockets_df = pd.DataFrame(rockets_data)
     launchpads_df = pd.DataFrame(launchpads_data)
     payloads_df = pd.DataFrame(payloads_data)
     cores_df = pd.DataFrame(cores_data)
+    static_data = pd.DataFrame(static_data)
     
 
     # Define a function to convert unsupported data types
