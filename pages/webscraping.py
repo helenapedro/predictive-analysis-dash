@@ -57,8 +57,11 @@ def fetch_falcon_9_launch_data():
         if name:
             column_names.append(name)
 
-    # Create dictionary to hold the scraped data
-    launch_dict = dict.fromkeys(column_names)
+    # Print column names to verify 'Date' is included
+    print("Column Names:", column_names)
+
+    # Create dictionary to hold the scraped data, initializing with empty lists
+    launch_dict = {name: [] for name in column_names}
     launch_dict['Flight No.'] = []
     launch_dict['Launch site'] = []
     launch_dict['Payload'] = []
@@ -102,15 +105,23 @@ def fetch_falcon_9_launch_data():
 
                     launch_dict['Booster landing'].append(landing_status(row[8]))
 
+    # Ensure all columns are the same length
+    max_length = max(len(lst) for lst in launch_dict.values() if lst is not None)  # Find the maximum length, excluding None
+    for key, value in launch_dict.items():
+        # Append None (or any placeholder) to lists that are shorter
+        while len(value) < max_length:
+            value.append(None)
+
     # Convert the dictionary into a DataFrame
     df = pd.DataFrame(launch_dict)
     return df
 
 
-layout = html.Div([ 
+
+layout = dbc.Container([ 
     html.H1("Falcon 9 and Falcon Heavy Launch Records"),
-    html.Button("Scrape Launch Data", id="scrape-button", n_clicks=0),
-    html.Div(id="table-container"),
+    html.Button("Download Scrape Launch Data", id="scrape-button", n_clicks=0),
+    dbc.Col(id="table-container"),
     dcc.Download(id="download-dataframe-csv")
 ])
 
