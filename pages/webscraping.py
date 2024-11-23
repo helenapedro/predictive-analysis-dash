@@ -6,7 +6,7 @@ import pandas as pd
 import unicodedata
 import requests
 
-# Scraping Functions (re-used from your original script)
+# Scraping Functions
 def date_time(table_cells):
     return [data_time.strip() for data_time in list(table_cells.strings)][0:2]
 
@@ -54,7 +54,7 @@ def fetch_falcon_9_launch_data():
     tc = first_launch_table.find_all('th')
     for th in tc:
         name = extract_column_from_header(th)
-        if name:
+        if name and name != 'Date and time':  # Exclude the 'Date and time' column
             column_names.append(name)
 
     # Create dictionary to hold the scraped data, initializing with empty lists
@@ -79,6 +79,7 @@ def fetch_falcon_9_launch_data():
                 if flight_number and flight_number.isdigit():
                     row = rows.find_all('td')
 
+                    # Get Date and Time separately
                     datatimelist = date_time(row[0])
                     date = datatimelist[0].strip(',')
                     launch_dict['Date'].append(date)
@@ -97,20 +98,26 @@ def fetch_falcon_9_launch_data():
                     launch_dict['Customer'].append(row[6].a.string if row[6].a else '')
                     
                     # Handling NoneType for Launch Outcome
-                    launch_outcome = row[7].string.strip() if row[7].string else 'N/A'  # Use 'N/A' if None
+                    launch_outcome = row[7].string.strip() if row[7].string else 'N/A'
                     launch_dict['Launch outcome'].append(launch_outcome)
 
                     launch_dict['Booster landing'].append(landing_status(row[8]))
 
     # Ensure all columns are the same length
     max_length = max(len(lst) for lst in launch_dict.values() if lst is not None)  # Find the maximum length, excluding None
-    for value in launch_dict.values():
+    for key, value in launch_dict.items():
+        # Append None (or any placeholder) to lists that are shorter
         while len(value) < max_length:
             value.append(None)
 
     # Convert the dictionary into a DataFrame
     df = pd.DataFrame(launch_dict)
+
+    # Return only the relevant columns
+    df = df[['Flight No.', 'Date', 'Time', 'Launch site', 'Payload', 'Payload mass', 'Orbit', 'Customer', 'Launch outcome', 'Version Booster', 'Booster landing']]
+
     return df
+
 
 # Layout definition
 layout = dbc.Container([ 
