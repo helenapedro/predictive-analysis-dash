@@ -97,30 +97,25 @@ def create_data_table(id, columns, data):
         style_header=style_header,
     )
 
-def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
-    return html.Div(
+# Function to create the API fetching description
+def create_api_fetching_description():
+    description_card = html.Div(
         [
-            # Page Title
-            html.H1('Data Exploration', style={'textAlign': 'center', 'padding': '20px', 'color': '#4CAF50'}),
-
-            # Information Section
+            html.Button(
+                "Show/Hide Code Snippet", 
+                id="toggle-button", 
+                n_clicks=0,
+                className="btn btn-primary mb-3"
+            ),
             html.Div(
                 [
-                    html.Button(
-                        "Show/Hide Code Snippet", 
-                        id="toggle-button", 
-                        n_clicks=0,
-                        className="btn btn-primary mb-3"
+                    html.H3(
+                        "This dataset was gathered using a GET request from the SpaceX REST API. "
+                        "To explore how this data was collected, click the button above to view the code snippet.",
+                        className="text-start"
                     ),
-                    html.Div(
-                        [
-                            html.H3(
-                                "This dataset was gathered using a GET request from the SpaceX REST API. "
-                                "To explore how this data was collected, click the button above to view the snippet code.",
-                                className="text-start"
-                            ),
-                            html.Pre(
-                                """
+                    html.Pre(
+                        """
 import requests, import pandas as pd
                                              
 def fetch_data_from_api(endpoint):
@@ -132,31 +127,42 @@ def fetch_data_from_api(endpoint):
           data = response.json()
           return data
      except requests.exceptions.RequestException as e:
-          ...
+        print(f"Error fetching data from API: {e}")
+        return None
 
 def fetch_rockets_data(): return fetch_data_from_api('rockets')
 def fetch_launchpads_data(): return fetch_data_from_api('launchpads')
 def fetch_payloads_data(): return fetch_data_from_api('payloads')
 def fetch_cores_data(): return fetch_data_from_api('cores')
-                                """,
-                                id="summary-content",
-                                style={
-                                    'backgroundColor': '#f4f4f4',
-                                    'padding': '10px',
-                                    'borderRadius': '5px',
-                                    'whiteSpace': 'pre-wrap',
-                                    'overflowX': 'scroll',
-                                },
-                                className="pre-scrollable"
-                            ),
-                        ],
-                        style={'marginBottom': '20px'},
-                        className="card p-3"
+                        """,
+                        id="summary-content",
+                        style={
+                            'backgroundColor': '#f4f4f4',
+                            'padding': '10px',
+                            'borderRadius': '5px',
+                            'whiteSpace': 'pre-wrap',
+                            'overflowX': 'scroll',
+                        },
+                        className="pre-scrollable"
                     ),
                 ],
-                className="container mt-5",
+                style={'marginBottom': '20px'},
+                className="card p-3"
             ),
+        ],
+        className="container mt-5",
+    )
+    return description_card
 
+
+def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
+    return html.Div(
+        [
+            # Page Title
+            html.H1('Data Exploration', style={'textAlign': 'center', 'padding': '20px', 'color': '#4CAF50'}),
+
+            # Information Section
+            create_api_fetching_description(),
             # Tabs Section
             dcc.Tabs(
                 [
