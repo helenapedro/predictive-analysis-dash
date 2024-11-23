@@ -5,6 +5,7 @@ from sidebar import create_navibar
 from pages.home import create_home_page
 from pages.about import create_about_content
 from pages.data_exploration import create_exploration_page, fetch_and_process_data
+from pages.webscraping import layout as scraping_layout
 
 app = Dash(
     __name__,
@@ -137,8 +138,9 @@ def display_page(pathname):
     elif pathname == "/about":
         return create_about_content()
     elif pathname == "/exploration":
-        # Pass the preprocessed data to the exploration page
         return create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df)
+    elif pathname == "/scraping":
+        return scraping_layout
     else:
         return html.H1("404: Page Not Found", className="error")
 
