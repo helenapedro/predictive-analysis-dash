@@ -9,7 +9,10 @@ def create_about_content():
                 [
                     html.H3(
                         [
-                            "The project delves into the feasibility of SpaceY entering the rocket launch market to rival SpaceX, with a focus on reducing launch costs via reusable rocket stages."
+                            """
+                            The project delves into the feasibility of SpaceY entering the rocket launch market 
+                            to rival SpaceX, with a focus on reducing launch costs via reusable rocket stages.
+                            """
                          ], className="card-subtitle"
                     ),
                 ],

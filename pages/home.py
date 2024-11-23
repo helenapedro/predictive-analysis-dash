@@ -41,6 +41,7 @@ def create_home_page():
 
 @callback(Output(component_id='success-pie-chart', component_property='figure'),
               Input(component_id='site-dropdown', component_property='value'))
+
 def get_pie_chart_callback(entered_site):    
     fig = get_pie_chart(entered_site)     
     return fig
@@ -48,6 +49,7 @@ def get_pie_chart_callback(entered_site):
 @callback(Output(component_id='success-payload-scatter-chart', component_property='figure'),
               Input(component_id='site-dropdown', component_property='value'), 
               Input(component_id="payload-slider", component_property="value"))
+
 def get_scatter_chart_callback(entered_site, payload_range):
     fig = get_scatter_chart(entered_site, payload_range)
     return fig
