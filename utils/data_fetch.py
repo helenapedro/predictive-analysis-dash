@@ -3,12 +3,18 @@ from utils.data import fetch_rockets_data,fetch_launchpads_data, fetch_payloads_
 
 def fetch_ad_process_static_data():
     static_data = fetch_static_data()
-    if static_data: 
-          df = pd.DataFrame(static_data)  
-          pd.set_option('display.max_columns', None)
-          print(df.head(3))
-    else: 
-          print("No data to display")
+    if static_data:
+        df = pd.DataFrame(static_data)
+
+        df = df.map(
+            lambda x: str(x) if not isinstance(x, (str, int, float, bool, type(None))) else x
+        )
+
+        pd.set_option('display.max_columns', None)
+        return df.head(5)
+    else:
+        return pd.DataFrame(columns=["Column1", "Column2", "Column3"])  # Update with your actual column names
+
 
 def fetch_and_process_data():
     rockets_data = fetch_rockets_data()

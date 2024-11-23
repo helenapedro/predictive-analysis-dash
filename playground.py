@@ -8,9 +8,9 @@ def fetch_and_process_data():
         df = pd.DataFrame(static_data)
         pd.set_option('display.max_columns', None)
         
-        print("-----------------------DF COLUMNS--------------------------")
+        """ print("-----------------------DF COLUMNS--------------------------")
         print(df.columns)
-        print("-----------------------DF HEAD--------------------------")
+        print("-----------------------DF HEAD--------------------------") """
         
         # Create a PrettyTable object
         table = PrettyTable()
@@ -20,12 +20,11 @@ def fetch_and_process_data():
         
         print(table)
         
-        print("-----------------------DF DTYPES--------------------------")
+        """ print("-----------------------DF DTYPES--------------------------")
         print(df.dtypes)
         print("-----------------------ROCKET Column--------------------------")
         print(df['rocket'])
         print("-----------------------ROCKET ID TO NAME--------------------------")
-        """ 
         Add additional transformations or logic if required.
         """
     else: 
