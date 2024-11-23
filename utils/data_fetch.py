@@ -1,6 +1,15 @@
 import pandas as pd
 from utils.data import fetch_rockets_data,fetch_launchpads_data, fetch_payloads_data, fetch_cores_data, fetch_static_data
 
+def fetch_ad_process_static_data():
+    static_data = fetch_static_data()
+    if static_data: 
+          df = pd.DataFrame(static_data)  
+          pd.set_option('display.max_columns', None)
+          print(df.head(3))
+    else: 
+          print("No data to display")
+
 def fetch_and_process_data():
     rockets_data = fetch_rockets_data()
     launchpads_data = fetch_launchpads_data()

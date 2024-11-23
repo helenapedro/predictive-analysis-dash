@@ -5,8 +5,9 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.clean_data import create_clean_data, fetch_and_clean_launch_data
 from utils.api_description import create_api_fetching_description
-from utils.data_fetch import fetch_and_process_data
+from utils.data_fetch import fetch_and_process_data, fetch_ad_process_static_data
 from utils.datatable import create_data_table
+from utils.row_data import fetch_row_data
 
 launch_data = fetch_and_clean_launch_data()
 
@@ -18,6 +19,8 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
 
             # Information Section
             create_api_fetching_description(),
+            # Static data
+            fetch_row_data(),
             # Tabs Section
             dcc.Tabs(
                 [
@@ -102,6 +105,7 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
 
 # Fetch and process data
 rockets_df, launchpads_df, payloads_df, cores_df = fetch_and_process_data()
+static_data = fetch_ad_process_static_data()
 
 # Create the exploration page layout
 layout = create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df)
