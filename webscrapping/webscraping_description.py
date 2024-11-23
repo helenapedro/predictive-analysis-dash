@@ -3,7 +3,11 @@ from utils.description_card import create_description_card
 def create_webscraping_description():
     button_id = "toggle-webscraping-description"
     button_text = "Show/Hide Code Snippet"
-    description_text = "Click the button to view the webscraping code snippet."
+    description_text = """
+          The web scraping process involved accessing Wikipedia's 'List of Falcon 9 and Falcon Heavy launches' page 
+          to extract historical launch data. Using BeautifulSoup, the HTML table was parsed, cleaned, and formatted 
+          into a Pandas DataFrame for further analysis.
+     """
     code_snippet = """
      from bs4 import BeautifulSoup
      import pandas as pd

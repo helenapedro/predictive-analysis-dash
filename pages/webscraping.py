@@ -7,7 +7,6 @@ import unicodedata
 import requests
 
 from webscrapping.webscraping_description import create_webscraping_description
-from webscrapping.webscraping_summary import create_webscraping_summary
 
 # Scraping Functions
 def date_time(table_cells):
@@ -127,11 +126,10 @@ layout = dbc.Container([
         dbc.Col(
             dbc.Card(
                 [
-                    dbc.CardHeader(html.H2("Falcon 9 and Falcon Heavy Launch Records", className="text-center")),
+                    dbc.CardHeader(html.H1("Falcon 9 and Falcon Heavy Launch Records", className='text-center mb-4', style={'color': '#4CAF50'}),),
                     dbc.CardBody(
                         [
-                            create_webscraping_description(),
-                            create_webscraping_summary(),
+                            dbc.Col(create_webscraping_description()),
                             html.Button("Download Scrape Launch Data", id="scrape-button", n_clicks=0),
                             dbc.Col(id="table-container"),  # Empty initially, filled after data fetch
                             dcc.Download(id="download-dataframe-csv")
