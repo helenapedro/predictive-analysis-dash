@@ -4,7 +4,7 @@ def create_navibar():
     return dbc.Navbar(
         dbc.Container(
             [
-                dbc.NavbarBrand("Rocket Launch Prediction Analysis", className="ms-2"),
+                dbc.NavbarBrand("Rocket Launch Predictive Analysis", className="ms-2"),
                 dbc.NavbarToggler(id="navbar-toggler"),
                 dbc.Collapse(
                     dbc.Nav(
