@@ -28,6 +28,9 @@ def fetch_data(endpoint, base_url_type='spacex'):
         return None
 
 # Fetching specific datasets
+def fetch_initial_spacex_data():
+    return fetch_data('API_call_spacex_api.json', base_url_type='static')
+
 def fetch_rockets_data():
     return fetch_data('rockets', base_url_type='spacex')
 
@@ -40,5 +43,3 @@ def fetch_payloads_data():
 def fetch_cores_data():
     return fetch_data('cores', base_url_type='spacex')
 
-def fetch_static_data():
-    return fetch_data('API_call_spacex_api.json', base_url_type='static')

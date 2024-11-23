@@ -1,10 +1,10 @@
 import pandas as pd
-from utils.data import fetch_rockets_data,fetch_launchpads_data, fetch_payloads_data, fetch_cores_data, fetch_static_data
+from utils.data import fetch_rockets_data,fetch_launchpads_data, fetch_payloads_data, fetch_cores_data, fetch_initial_spacex_data
 
-def fetch_ad_process_static_data():
-    static_data = fetch_static_data()
-    if static_data:
-        df = pd.DataFrame(static_data)
+def fetch_initial_data():
+    initial_data = fetch_initial_spacex_data()
+    if initial_data:
+        df = pd.DataFrame(initial_data)
 
         df = df.map(
             lambda x: str(x) if not isinstance(x, (str, int, float, bool, type(None))) else x
@@ -13,7 +13,7 @@ def fetch_ad_process_static_data():
         pd.set_option('display.max_columns', None)
         return df.head(5)
     else:
-        return pd.DataFrame(columns=["Column1", "Column2", "Column3"])  # Update with your actual column names
+        return pd.DataFrame(columns=["Column1", "Column2", "Column3"]) 
 
 
 def fetch_and_process_data():
@@ -21,14 +21,14 @@ def fetch_and_process_data():
     launchpads_data = fetch_launchpads_data()
     payloads_data = fetch_payloads_data()
     cores_data = fetch_cores_data()
-    static_data = fetch_static_data()
+    initial_data = fetch_initial_data()
 
     # Convert to DataFrames
     rockets_df = pd.DataFrame(rockets_data)
     launchpads_df = pd.DataFrame(launchpads_data)
     payloads_df = pd.DataFrame(payloads_data)
     cores_df = pd.DataFrame(cores_data)
-    static_data = pd.DataFrame(static_data)
+    initial_data = pd.DataFrame(initial_data)
     
 
     # Define a function to convert unsupported data types

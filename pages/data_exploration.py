@@ -1,13 +1,14 @@
 from dash import dcc, html
+import dash_bootstrap_components as dbc
 import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.clean_data import create_clean_data, fetch_and_clean_launch_data
-from utils.api_description import create_api_fetching_description
-from utils.data_fetch import fetch_and_process_data, fetch_ad_process_static_data
+from utils.clean_data import fetch_and_clean_launch_data
+from utils.data_fetch import fetch_initial_data, fetch_and_process_data
 from utils.datatable import create_data_table
-from utils.row_data import fetch_row_data
+from utils.row_data import fetch_initial_data_layout
+from utils.api_description import create_api_fetching_description
 
 launch_data = fetch_and_clean_launch_data()
 
@@ -20,7 +21,40 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
             # Information Section
             create_api_fetching_description(),
             # Static data
-            fetch_row_data(),
+            initial_data_layout,
+            
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        dbc.CardHeader(
+                            "From the initial data, I observed that many columns, such as the rocket column, "
+                            "only contain ID numbers without additional information. Therefore, I used the "
+                            "SpaceX API to enrich this data by extracting detailed information based on these IDs."
+                        ),
+                        dbc.ListGroup(
+                            [
+                                dbc.ListGroupItem("Rocket: Retrieve the booster name."),
+                                dbc.ListGroupItem("Payload: Obtain the mass of the payload and the orbit it will enter."),
+                                dbc.ListGroupItem("Launchpad: Identify the name of the launch site, as well as its longitude and latitude."),
+                                dbc.ListGroupItem(
+                                    html.Div(
+                                        """
+                                        Cores: Gather detailed information including the landing outcome, landing type, 
+                                        number of flights for that core, usage of grid fins, whether the core is reused, 
+                                        presence of legs, the landing pad used, the block version, reuse count, and the 
+                                        serial number of the core.
+                                        """,
+                                        style={"whiteSpace": "pre-line"}  # Ensure multiline text is displayed properly
+                                    )
+                                ),
+                            ]
+                        )
+                    ]
+                )
+            ),
+
+            html.Br(),
+
             # Tabs Section
             dcc.Tabs(
                 [
@@ -98,14 +132,14 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
                     ),
                 ],
             ),
-            create_clean_data(launch_data)
         ],
         className="container mt-5",
     )
 
 # Fetch and process data
 rockets_df, launchpads_df, payloads_df, cores_df = fetch_and_process_data()
-static_data = fetch_ad_process_static_data()
+initial_data = fetch_initial_data()
+initial_data_layout = fetch_initial_data_layout()
 
 # Create the exploration page layout
 layout = create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df)

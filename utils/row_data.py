@@ -1,20 +1,23 @@
 from dash import html, dash_table
-from utils.data_fetch import fetch_ad_process_static_data
+import dash_bootstrap_components as dbc
+from utils.data_fetch import fetch_initial_data
+from utils.description_card import create_description_card
 
 # Fetch and process the data
-dataframe = fetch_ad_process_static_data()
+dataframe = fetch_initial_data()
 
-def fetch_row_data():
+def fetch_initial_data_layout():
     if dataframe.empty:
         return html.Div("No data available to display", style={"textAlign": "center", "padding": "20px"})
 
-    return html.Div(
+    return dbc.Col(
         [
             html.H1("SpaceX Data Table"),
             dash_table.DataTable(
                 id='spacex-data-table',
                 columns=[{"name": col, "id": col} for col in dataframe.columns],
-                data=dataframe.to_dict('records'),  # Convert DataFrame to a list of dictionaries
+                # Convert DataFrame to a list of dictionaries
+                data=dataframe.to_dict('records'),  
                 style_table={'overflowX': 'auto'}, 
                 style_cell={
                     'textAlign': 'left',
@@ -28,6 +31,31 @@ def fetch_row_data():
                 style_data={
                     'backgroundColor': 'rgb(250, 250, 250)',
                 },
-            )
+            ),
+            initial_data_table_description(),
         ]
     )
+
+def initial_data_table_description():
+    description_text = (
+        "Click the button to view the above table data code snippet."
+    )
+    code_snippet = """
+import pandas as pd
+from utils.data import fetch_initial_data
+
+def fetch_initial_data():
+initial_data = fetch_initial_data()
+if initial_data:
+     df = pd.DataFrame(initial_data)
+
+     df = df.map(
+          lambda x: str(x) if not isinstance(x, (str, int, float, bool, type(None))) else x
+     )
+
+     pd.set_option('display.max_columns', None)
+     return df.head(5)
+else:
+     return pd.DataFrame(columns=["Column1", "Column2", "Column3"]) 
+        """
+    return create_description_card("toggle-button-initial", "Show/Hide Code Snippet", description_text, code_snippet, "initial-table-summary")

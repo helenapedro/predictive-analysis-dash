@@ -81,15 +81,33 @@ def toggle_about_sidebar(n_about_clicks, n_close_clicks, sidebar_style):
         return {**sidebar_style, "left": "-320px"} 
     return sidebar_style
 
-# Dynamic callback for the toggle button
+# Unified callback for toggle buttons
 @app.callback(
-    Output("summary-content", "style"),  # Updated ID for sidebar summary content
-    [Input("toggle-button", "n_clicks")],  # Updated ID for sidebar toggle button
+    [Output("summary-content", "style"), Output("initial-table-summary", "style")],
+    [Input("toggle-button-summary", "n_clicks"), Input("toggle-button-initial", "n_clicks")],
+    [State("summary-content", "style"), State("initial-table-summary", "style")],
 )
-def toggle_summary(n_clicks):
-    if n_clicks and n_clicks % 2 == 1:
-        return {"display": "block"}
-    return {"display": "none"}
+def toggle_summaries(toggle_summary_n, toggle_initial_n, summary_style, initial_style):
+    from dash import callback_context  # Ensure you're using the correct `ctx`
+
+    # Initialize styles if None (happens on the first load)
+    summary_style = summary_style or {"display": "none"}
+    initial_style = initial_style or {"display": "none"}
+
+    # Get the ID of the triggered button
+    ctx = callback_context
+    if not ctx.triggered:
+        return summary_style, initial_style
+
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if button_id == "toggle-button-summary":
+        summary_style["display"] = "block" if toggle_summary_n % 2 == 1 else "none"
+    elif button_id == "toggle-button-initial":
+        initial_style["display"] = "block" if toggle_initial_n % 2 == 1 else "none"
+
+    return summary_style, initial_style
+
 
 # Page Navigation
 @app.callback(
@@ -103,7 +121,7 @@ def display_page(pathname):
         return create_about_content()
     elif pathname == "/exploration":
         # Pass the preprocessed data to the exploration page
-        return create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df,)
+        return create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df)
     else:
         return html.H1("404: Page Not Found", className="error")
 
