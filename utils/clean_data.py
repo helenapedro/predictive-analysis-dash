@@ -4,7 +4,7 @@ from dash import dash_table
 import pandas as pd
 import requests
 
-def fetch_static_data_from_api(endpoint):
+def fetch_initial_data_from_api(endpoint):
     base_url = 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DS0321EN-SkillsNetwork/datasets/'
     url = f"{base_url}{endpoint}"
     try:
@@ -17,7 +17,7 @@ def fetch_static_data_from_api(endpoint):
         return None
 
 def fetch_rocket_launch_data():
-    return fetch_static_data_from_api('API_call_spacex_api.json')
+    return fetch_initial_data_from_api('API_call_spacex_api.json')
 
 def fetch_and_clean_data(raw_data):
     if not raw_data:

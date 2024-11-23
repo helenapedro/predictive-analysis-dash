@@ -1,7 +1,8 @@
 from dash import html
+import dash_bootstrap_components as dbc
 
 def create_description_card(button_id, button_text, description_text, code_snippet, card_id):
-    return html.Div(
+    return dbc.Col(
         [
             html.Button(
                 button_text, 
@@ -9,7 +10,7 @@ def create_description_card(button_id, button_text, description_text, code_snipp
                 n_clicks=0,
                 className="btn btn-primary mb-3"
             ),
-            html.Div(
+            dbc.Col(
                 [
                     html.H3(description_text, className="text-start"),
                     html.Pre(

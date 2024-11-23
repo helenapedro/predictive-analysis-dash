@@ -12,7 +12,7 @@ def fetch_initial_data_layout():
 
     return dbc.Col(
         [
-            html.H1("SpaceX Data Table"),
+            html.H1("Initial Data Table"),
             dash_table.DataTable(
                 id='spacex-data-table',
                 columns=[{"name": col, "id": col} for col in dataframe.columns],

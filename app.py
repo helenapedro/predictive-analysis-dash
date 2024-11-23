@@ -83,30 +83,47 @@ def toggle_about_sidebar(n_about_clicks, n_close_clicks, sidebar_style):
 
 # Unified callback for toggle buttons
 @app.callback(
-    [Output("summary-content", "style"), Output("initial-table-summary", "style")],
-    [Input("toggle-button-summary", "n_clicks"), Input("toggle-button-initial", "n_clicks")],
-    [State("summary-content", "style"), State("initial-table-summary", "style")],
+    [
+        Output("summary-content", "style"),
+        Output("initial-table-summary", "style"),
+        Output("processed-data-content", "style")
+    ],
+    [
+        Input("toggle-button-summary", "n_clicks"),
+        Input("toggle-button-initial", "n_clicks"),
+        Input("toggle-processed-summary", "n_clicks")
+    ],
+    [
+        State("summary-content", "style"),
+        State("initial-table-summary", "style"),
+        State("processed-data-content", "style")
+    ],
 )
-def toggle_summaries(toggle_summary_n, toggle_initial_n, summary_style, initial_style):
-    from dash import callback_context  # Ensure you're using the correct `ctx`
+def toggle_summaries(toggle_summary_n, toggle_initial_n, toggle_processed_n, summary_style, initial_style, processed_style):
+    from dash import callback_context
 
-    # Initialize styles if None (happens on the first load)
+    # Initialize styles if None (first load)
     summary_style = summary_style or {"display": "none"}
     initial_style = initial_style or {"display": "none"}
+    processed_style = processed_style or {"display": "none"}
 
     # Get the ID of the triggered button
     ctx = callback_context
     if not ctx.triggered:
-        return summary_style, initial_style
+        return summary_style, initial_style, processed_style
 
     button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
+    # Toggle logic for each button
     if button_id == "toggle-button-summary":
         summary_style["display"] = "block" if toggle_summary_n % 2 == 1 else "none"
     elif button_id == "toggle-button-initial":
         initial_style["display"] = "block" if toggle_initial_n % 2 == 1 else "none"
+    elif button_id == "toggle-processed-summary":
+        processed_style["display"] = "block" if toggle_processed_n % 2 == 1 else "none"
 
-    return summary_style, initial_style
+    return summary_style, initial_style, processed_style
+
 
 
 # Page Navigation
