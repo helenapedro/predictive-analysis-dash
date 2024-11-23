@@ -115,14 +115,9 @@ def fetch_falcon_9_launch_data():
 # Layout definition
 layout = dbc.Container([ 
     html.H1("Falcon 9 and Falcon Heavy Launch Records"),
-    html.Button("Scrape Launch Data", id="scrape-button", n_clicks=0),
+    html.Button("Download Scrape Launch Data", id="scrape-button", n_clicks=0),
     html.Br(),
-    dcc.Loading(
-        
-        id="loading",
-        type="circle",  # You can also use 'dot', 'circle', etc.
-        children=dbc.Col(id="table-container")  # Wrap the table container with a Loading component
-    ),
+    dbc.Col(id="table-container"),  # Empty initially, filled after data fetch
     dcc.Download(id="download-dataframe-csv")
 ])
 
@@ -133,20 +128,21 @@ layout = dbc.Container([
     [Input("scrape-button", "n_clicks")]
 )
 def update_table(n_clicks):
+    # Fetch and process the launch data
+    df = fetch_falcon_9_launch_data()
+
+    # Convert DataFrame to Dash table
+    table = dash_table.DataTable(
+        id="launch-table",
+        columns=[{"name": col, "id": col} for col in df.columns],
+        data=df.to_dict("records"),
+        style_table={'height': '400px', 'overflowY': 'auto'},
+        style_cell={'textAlign': 'center'},
+    )
+
+    # Generate CSV download only when button is clicked
     if n_clicks > 0:
-        # Fetch and process the launch data
-        df = fetch_falcon_9_launch_data()
-
-        # Convert DataFrame to Dash table
-        table = dash_table.DataTable(
-            id="launch-table",
-            columns=[{"name": col, "id": col} for col in df.columns],
-            data=df.to_dict("records"),
-            style_table={'height': '400px', 'overflowY': 'auto'},
-            style_cell={'textAlign': 'center'},
-        )
-
-        # Generate CSV download
         return table, dcc.send_data_frame(df.to_csv, "falcon9_launches.csv")
 
-    return None, None
+    # Return only the table without download
+    return table, None
