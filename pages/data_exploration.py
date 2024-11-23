@@ -36,10 +36,18 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
             ),
             html.Br(),
 
-            initial_data_layout,
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                       initial_data_layout
+
+                    ]
+                )
+            ),
+            html.Br(),
+            
             initial_table_card_summary(),
             html.Br(),
-
             # Tabs Section
             dcc.Tabs(
                 [
