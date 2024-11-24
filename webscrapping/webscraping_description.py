@@ -86,6 +86,40 @@ def create_webscraping_description():
           df = pd.DataFrame(launch_dict)
 
           return df
+
+     # Scraping Functions
+     def date_time(table_cells):
+          return [data_time.strip() for data_time in list(table_cells.strings)][0:2]
+
+     def booster_version(table_cells):
+          out = ''.join([booster_version for i, booster_version in enumerate(table_cells.strings) if i % 2 == 0][0:-1])
+          return out
+
+     def landing_status(table_cells):
+          return [i for i in table_cells.strings][0]
+
+     def get_mass(table_cells):
+          mass = unicodedata.normalize("NFKD", table_cells.text).strip()
+          if mass:
+               mass.find("kg")
+               new_mass = mass[0:mass.find("kg") + 2]
+          else:
+               new_mass = 0
+          return new_mass
+
+     def extract_column_from_header(row):
+          if row.br:
+               row.br.extract()
+          if row.a:
+               row.a.extract()
+          if row.sup:
+               row.sup.extract()
+
+          column_name = ' '.join(row.contents)
+
+          if not (column_name.strip().isdigit()):
+               column_name = column_name.strip()
+               return column_name
     """
     card_id = "webscraping-data-description"
     
