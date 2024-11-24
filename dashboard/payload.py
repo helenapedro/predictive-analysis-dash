@@ -1,4 +1,4 @@
-from utils.loaddata import load_data
+from data.loaddata import load_data
 
 df = load_data('spacex_launch_dash.csv')
 

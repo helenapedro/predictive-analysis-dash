@@ -1,6 +1,6 @@
 import pandas as pd # type: ignore
 from prettytable import PrettyTable # type: ignore
-from utils.data import fetch_static_data
+from data.data import fetch_static_data
 
 def fetch_and_process_data():
     static_data = fetch_static_data()

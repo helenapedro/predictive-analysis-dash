@@ -1,5 +1,5 @@
 from dash import dcc
-from utils.datatable import create_data_table
+from data.datatable import create_data_table
 
 def launch_tab(launchpads_df):
      return dcc.Tab(

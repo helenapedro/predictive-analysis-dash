@@ -1,6 +1,6 @@
 from dash import html, dash_table
 import dash_bootstrap_components as dbc
-from utils.data_fetch import fetch_initial_data
+from data.data_fetch import fetch_initial_data
 from utils.description_card import create_description_card
 
 # Fetch and process the data

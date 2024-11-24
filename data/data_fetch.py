@@ -1,5 +1,5 @@
 import pandas as pd
-from utils.data import fetch_rockets_data,fetch_launchpads_data, fetch_payloads_data, fetch_cores_data, fetch_initial_spacex_data
+from data.data import fetch_rockets_data,fetch_launchpads_data, fetch_payloads_data, fetch_cores_data, fetch_initial_spacex_data
 
 def fetch_initial_data():
     initial_data = fetch_initial_spacex_data()
