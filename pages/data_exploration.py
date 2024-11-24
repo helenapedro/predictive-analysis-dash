@@ -3,7 +3,6 @@ import dash_bootstrap_components as dbc
 import sys
 import os
 
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.clean_data import fetch_and_clean_launch_data
 from utils.data_fetch import fetch_initial_data, fetch_and_process_data
@@ -21,47 +20,85 @@ from tabs.core_reuse_tab import cores_reuse_tab
 launch_data = fetch_and_clean_launch_data()
 
 def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
-    return html.Div(
+    return dbc.Container(
         [
             # Page Title
-            html.H1('Data Exploration', style={'textAlign': 'center', 'padding': '20px', 'color': '#4CAF50'}),
-
-            dbc.Card(
-                dbc.CardBody(
-                    [
-                        create_api_fetching_description(),
-
-                    ]
+            dbc.Row(
+                dbc.Col(
+                    html.H1(
+                        'Data Exploration',
+                        className='text-center mb-4',
+                        style={'color': '#4CAF50'}
+                    )
                 )
             ),
-            html.Br(),
 
-            dbc.Card(
-                dbc.CardBody(
-                    [
-                       initial_data_layout
-
-                    ]
+            # API Fetching Description
+            dbc.Row(
+                dbc.Col(
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(html.H3("API Data Fetching Description")),
+                            dbc.CardBody(
+                                create_api_fetching_description()
+                            )
+                        ],
+                        className='mb-4'
+                    )
                 )
             ),
-            html.Br(),
-            
-            initial_table_card_summary(),
-            html.Br(),
+
+            # Initial Data Layout
+            dbc.Row(
+                dbc.Col(
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(html.H3("Initial Table")),
+                            dbc.CardBody(
+                                initial_data_layout
+                            )
+                        ],
+                        className='mb-4'
+                    )
+                )
+            ),
+
+            # Initial Table Summary
+            dbc.Row(
+                dbc.Col(
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(html.H3("Initial Table Summary")),
+                            dbc.CardBody(
+                                initial_table_card_summary()
+                            )
+                        ],
+                        className='mb-4'
+                    )
+                )
+            ),
+
             # Tabs Section
-            dcc.Tabs(
-                [
-                    rockets_tab(rockets_df),
-                    launch_tab(launchpads_df),
-                    payloads_tab(payloads_df),
-                    cores_tab(cores_df),
-                    payload_mass_distribution_tab(payloads_df),
-                    cores_reuse_tab(cores_df),
-                ],
-            ),
+            dbc.Row(
+                dbc.Col(
+                    dcc.Tabs(
+                        [
+                            rockets_tab(rockets_df),
+                            launch_tab(launchpads_df),
+                            payloads_tab(payloads_df),
+                            cores_tab(cores_df),
+                            payload_mass_distribution_tab(payloads_df),
+                            cores_reuse_tab(cores_df),
+                        ],
+                        className='mt-4'
+                    )
+                )
+            )
         ],
-        className="container mt-5",
+        fluid=True,
+        className="mt-5"
     )
+
 
 # Fetch and process data
 rockets_df, launchpads_df, payloads_df, cores_df = fetch_and_process_data()
