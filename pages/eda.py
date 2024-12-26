@@ -1,22 +1,161 @@
 from dash import dcc, html, Input, Output, State, callback
 import dash_bootstrap_components as dbc
-import mysql.connector
-import os
-from dotenv import load_dotenv
+from utils.queries import (
+    fetch_unique_launch_sites, 
+    fetch_launch_count, 
+    fetch_payload_mass_by_customer,
+    fetch_avg_payload_mass_by_booster,
+    fetch_mission_outcomes,
+    fetch_failed_landings
+)
 
-# Load environment variables
-load_dotenv()
+layout = dbc.Container([
+    dbc.Row([
+        dbc.Col(html.H1("EDA with SQL", className="text-center text-primary mb-4"), 
+                width=12
+        )
+    ]),
 
-# Database connection function
-def get_connection():
-    return mysql.connector.connect(
-        host=os.getenv('DB_HOST'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASSWORD'),
-        database=os.getenv('DB_NAME')
-    )
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader(
+                    html.Div([
+                         html.I(className="fas fa-info-circle me-2"),
+                         "Summary",
+                    ], className="bg-secondary text-white"),
+                ),    
+                dbc.CardBody([
+                        html.P("This page allows you to explore SpaceX launch data through interactive SQL queries."),
+                        html.Ul([
+                            html.Li("View unique launch sites."),
+                            html.Li("Fetch the launch count for a specific site."),
+                            html.Li("Analyze payload mass by customer."),
+                            html.Li("Examine mission outcomes."),
+                            html.Li("Identify failed landing outcomes on drone ships."),
+                        ]),
+                        html.P("The backend is powered by MySQL, and SQL queries are executed dynamically to provide the latest insights.")
+                ]),
+            ], className="mb-4 shadow-lg")
+        ], xs=12, sm=12, md=12, lg=8),
+    ], className="justify-content-center"),
 
-# Query functions
+    # Query Sections
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.Div([
+                            html.I(className="fas fa-map-marker-alt me-2"),
+                            "Unique Launch Sites"
+                        ], className="d-flex align-items-center bg-primary text-white")
+                    ),
+                    dbc.CardBody([
+                        html.Div(id="launch-site-list", className="list-group")
+                    ])
+                ], className="mb-4 shadow-lg hoverable")
+            ], xs=12, sm=12, md=6, lg=4),
+
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.Div([
+                            html.I(className="fas fa-rocket me-2"),
+                            "Launch Count"
+                        ], className="d-flex align-items-center bg-success text-white")
+                    ),
+                    dbc.CardBody([
+                        dbc.Input(id="site-input", type="text", placeholder="Enter Launch Site", className="mb-2"),
+                        dbc.Button("Get Count", id="count-btn", color="primary", className="mb-2"),
+                        html.Div(id="launch-count-output", className="text-muted")
+                    ])
+                ], className="mb-4 shadow-lg hoverable")
+            ], xs=12, sm=12, md=6, lg=4),    
+        ], className="justify-content-center"),
+
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.Div([
+                            html.I(className="fas fa-clipboard-check me-2"),
+                            "Mission Outcomes"
+                        ], className="d-flex align-items-center bg-warning text-white")
+                    ),
+                    dbc.CardBody([
+                        dbc.Spinner(html.Div(id="mission-outcomes-output", className="text-muted"))
+                    ])
+                ], className="mb-4 shadow-lg hoverable")
+            ], xs=12, sm=12, md=6, lg=4),
+
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.Div([
+                            html.I(className="fas fa-weight-hanging me-2"),
+                            "Payload Mass by Customer"
+                        ], className="d-flex align-items-center bg-info text-white"),
+                    ),
+                    dbc.CardBody([
+                        dcc.Dropdown(
+                            id="customer-dropdown",
+                            options=[
+                                {"label": "NASA (CRS)", "value": "NASA (CRS)"},
+                                {"label": "SES", "value": "SES"}
+                            ],
+                            placeholder="Select a Customer",
+                            className="mb-2"
+                        ),
+                        dbc.Spinner(html.Div(id="payload-mass-output", className="text-muted"))
+                    ])
+                ], className="mb-4 shadow-lg hoverable")
+            ], xs=12, sm=12, md=4),
+        ], className="justify-content-center"),
+
+        # Failed Landing Outcomes
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.Div([
+                            html.I(className="fas fa-times-circle me-2"),
+                            "Failed Landing Outcomes"
+                        ], className="d-flex align-items-center bg-danger text-white")
+                    ),
+                    dbc.CardBody([
+                        dbc.Spinner(html.Div(id="failed-landings-output", className="text-muted"))
+                    ])
+                ], className="mb-4 shadow-lg hoverable")
+            ], xs=12, sm=12, md=6, lg=4),
+        ], className="justify-content-center"),
+
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardFooter(
+                        dbc.Button("Show/Hide Code Snippets", id="toggle-code-btn", color="secondary", className="w-100")
+                    ),
+                    dbc.Collapse(
+                        dbc.CardBody(dcc.Markdown()), 
+                        id="code-output"
+                    )
+                ], className="shadow-lg hoverable")
+            ], xs=12, sm=12, md=12, lg=8)
+        ])
+
+], fluid=True)
+
+
+@callback(
+    [Output("code-output", "children"), Output("code-output", "style")],
+    [Input("toggle-code-btn", "n_clicks")],
+)
+def toggle_code(n_clicks):
+    if n_clicks:
+        if n_clicks % 2 == 1:
+            code_snippets = """
+```python
+# Fetch Unique Launch Sites
 def fetch_unique_launch_sites():
     connection = get_connection()
     cursor = connection.cursor()
@@ -25,6 +164,7 @@ def fetch_unique_launch_sites():
     connection.close()
     return [row[0] for row in rows]
 
+# Fetch Launch Count
 def fetch_launch_count(launch_site):
     connection = get_connection()
     cursor = connection.cursor()
@@ -33,122 +173,13 @@ def fetch_launch_count(launch_site):
     result = cursor.fetchone()[0]
     connection.close()
     return result
-
-def fetch_payload_mass_by_customer(customer):
-    connection = get_connection()
-    cursor = connection.cursor()
-    query = "SELECT SUM(PAYLOAD_MASS__KG_) FROM SPACEXTBL WHERE Customer = %s"
-    cursor.execute(query, (customer,))
-    result = cursor.fetchone()[0]
-    connection.close()
-    return result
-
-def fetch_avg_payload_mass_by_booster(booster_version):
-    connection = get_connection()
-    cursor = connection.cursor()
-    query = "SELECT AVG(PAYLOAD_MASS__KG_) FROM SPACEXTBL WHERE Booster_Version LIKE %s"
-    cursor.execute(query, (booster_version,))
-    result = cursor.fetchone()[0]
-    connection.close()
-    return result
-
-def fetch_mission_outcomes():
-    connection = get_connection()
-    cursor = connection.cursor()
-    query = "SELECT MISSION_OUTCOME, COUNT(MISSION_OUTCOME) AS TOTAL_NUMBER FROM SPACEXTBL GROUP BY MISSION_OUTCOME"
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    connection.close()
-    return rows
-
-def fetch_failed_landings():
-    connection = get_connection()
-    cursor = connection.cursor()
-    query = "SELECT LANDING_OUTCOME, BOOSTER_VERSION, LAUNCH_SITE FROM SPACEXTBL WHERE Landing_Outcome = 'Failure (drone ship)'"
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    connection.close()
-    return rows
-
-# Define the layout
-layout = dbc.Container([
-    dbc.Row([
-        dbc.Col(html.H1("EDA With SQL", className="text-center text-primary mb-4"))
-    ]),
-
-    dbc.Row([
-        dbc.Col([
-            dbc.Button("Show/Hide Summary", id="toggle-summary-btn", color="info", className="mb-2"),
-            html.Div(id="summary-output", style={"display": "none"}, className="border p-3 bg-light rounded")
-        ], width=12)
-    ], className="mb-4"),
-
-    dbc.Row([
-        dbc.Col([
-            html.H3("Unique Launch Sites", className="text-secondary"),
-            html.Ul(id="launch-site-list", className="list-group")
-        ], width=6),
-
-        dbc.Col([
-            html.H3("Launch Count for Specific Site", className="text-secondary"),
-            dbc.Input(id="site-input", type="text", placeholder="Enter Launch Site", className="mb-2"),
-            dbc.Button("Get Count", id="count-btn", color="primary", className="mb-2"),
-            html.Div(id="launch-count-output", className="mt-2 text-info")
-        ], width=6)
-    ], className="mb-4"),
-
-    dbc.Row([
-        dbc.Col([
-            html.H3("Total Payload Mass by Customer", className="text-secondary"),
-            dcc.Dropdown(
-                id="customer-dropdown",
-                options=[
-                    {"label": "NASA (CRS)", "value": "NASA (CRS)"},
-                    {"label": "SES", "value": "SES"}
-                ],
-                placeholder="Select a Customer",
-                className="mb-2"
-            ),
-            html.Div(id="payload-mass-output", className="mt-2 text-info")
-        ], width=6),
-
-        dbc.Col([
-            html.H3("Average Payload Mass by Booster Version", className="text-secondary"),
-            html.Div(id="avg-payload-mass-output", className="mt-2 text-info")
-        ], width=6)
-    ], className="mb-4"),
-
-    dbc.Row([
-        dbc.Col([
-            html.H3("Mission Outcomes", className="text-secondary"),
-            html.Div(id="mission-outcomes-output", className="mt-2 text-info")
-        ], width=6),
-
-        dbc.Col([
-            html.H3("Failed Landing Outcomes in Drone Ship", className="text-secondary"),
-            html.Div(id="failed-landings-output", className="mt-2 text-info")
-        ], width=6)
-    ])
-], fluid=True)
-
-# Define callbacks
-@callback(
-    [Output("summary-output", "children"), Output("summary-output", "style")],
-    Input("toggle-summary-btn", "n_clicks"),
-    State("summary-output", "style")
-)
-def toggle_summary(n_clicks, style):
-    if n_clicks:
-        if style["display"] == "none":
-            return (
-                html.Div([
-                    html.H4("Summary"),
-                    html.P("Explore SpaceX launch data: unique launch sites, launch counts, payload masses, mission outcomes, and more.")
-                ]), {"display": "block"}
-            )
+```
+            """
+            return dcc.Markdown(code_snippets), {"display": "block"}
         else:
             return "", {"display": "none"}
-    return "", style
+    return "", {"display": "none"}
+
 
 @callback(
     Output("launch-site-list", "children"),

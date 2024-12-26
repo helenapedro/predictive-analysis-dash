@@ -12,7 +12,7 @@ def create_navibar():
                             dbc.NavItem(dbc.NavLink("Dashboard", href="/", className="nav-link")),
                             dbc.NavItem(dbc.NavLink("Data Exploration", href="/exploration", className="nav-link")),
                             dbc.NavItem(dbc.NavLink("Webscraping", href="/scraping", className="nav-link")),
-                            dbc.NavItem(dbc.NavLink("EDA With SQL", href="/eda", className="nav-link")),
+                            dbc.NavItem(dbc.NavLink("EDA", href="/eda", className="nav-link")),
                             dbc.NavItem(dbc.NavLink("About", href="#", className="nav-link", id="about-link")),
                         ],
                         className="ms-auto",
