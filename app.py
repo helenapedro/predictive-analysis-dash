@@ -6,6 +6,7 @@ from pages.home import create_home_page
 from pages.about import create_about_content
 from pages.data_exploration import create_exploration_page, fetch_and_process_data
 from pages.webscraping import layout as scraping_layout
+from pages.eda import fetch_unique_launch_sites, fetch_launch_count, fetch_payload_mass_by_customer 
 
 app = Dash(
     __name__,
@@ -141,6 +142,32 @@ def display_page(pathname):
         return create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df)
     elif pathname == "/scraping":
         return scraping_layout
+    elif pathname == "/eda":
+        return html.Div([
+            html.H1("SpaceX Launch Data Dashboard"),
+            html.Div([
+                html.H2("Unique Launch Sites"),
+                html.Ul(id="launch-site-list")
+            ]),
+            html.Div([
+                html.H2("Launch Count for Specific Site"),
+                dcc.Input(id="site-input", type="text", placeholder="Enter Launch Site"),
+                html.Button("Get Count", id="count-btn"),
+                html.Div(id="launch-count-output")
+            ]),
+            html.Div([
+                html.H2("Total Payload Mass by Customer"),
+                dcc.Dropdown(
+                    id="customer-dropdown",
+                    options=[
+                        {"label": "NASA (CRS)", "value": "NASA (CRS)"},
+                        {"label": "SES", "value": "SES"}
+                    ],
+                    placeholder="Select a Customer"
+                ),
+                html.Div(id="payload-mass-output")
+            ])
+        ])
     else:
         return html.H1("404: Page Not Found", className="error")
 
