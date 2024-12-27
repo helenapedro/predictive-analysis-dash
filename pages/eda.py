@@ -141,7 +141,7 @@ layout = dbc.Container([
                     )
                 ], className="shadow-lg hoverable")
             ], xs=12, sm=12, md=12, lg=8)
-        ], className="justify-content-center")
+        ], className="justify-content-center"),
 
 ], fluid=True)
 
