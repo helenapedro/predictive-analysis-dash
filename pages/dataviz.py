@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 from utils.queries import (
-    fetch_unique_launch_sites, 
+    fetch_unique_launch_sites,      
     fetch_launch_count, 
     fetch_payload_mass_by_customer,
     fetch_avg_payload_mass_by_booster,
