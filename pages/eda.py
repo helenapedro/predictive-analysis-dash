@@ -15,7 +15,6 @@ df = pd.read_csv(data_path)
 def create_section(title, graph_id, description, conclusions):
     return dbc.Row([
         dbc.Col([
-            html.H2(title),
             dcc.Graph(id=graph_id),
             html.Div([
                 html.P(description),
