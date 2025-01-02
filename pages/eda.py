@@ -254,6 +254,18 @@ layout = dbc.Container(
                     dbc.Card([
                         dbc.CardHeader(
                             html.Div([
+                                html.I(className="fas fa-weight-hanging me-2"),
+                                "Average Payload Mass"
+                            ], className="d-flex align-items-center bg-secondary text-white"),
+                        ),
+                        dbc.CardBody([
+                            dbc.Spinner(html.Div(id="avg-payload-mass-output", className="text-muted"))
+                        ])
+                    ], className="mb-4 shadow-lg hoverable"),
+                    
+                    dbc.Card([
+                        dbc.CardHeader(
+                            html.Div([
                                 html.I(className="fas fa-times-circle me-2"),
                                 "Failed Landing Outcomes"
                             ], className="d-flex align-items-center bg-danger text-white")
@@ -263,17 +275,6 @@ layout = dbc.Container(
                         ])
                     ], className="mb-4 shadow-lg hoverable"),
 
-                    dbc.Card([
-                        dbc.CardHeader(
-                            html.Div([
-                                html.I(className="fas fa-weight-hanging me-2"),
-                                "Average Payload Mass"
-                            ], className="d-flex align-items-center bg-secondary text-white"),
-                        ),
-                        dbc.CardBody([
-                            dbc.Spinner(html.Div(id="avg-payload-mass-output", className="text-muted"))
-                        ])
-                    ], className="mb-4 shadow-lg hoverable"),
 
                 ],
                 xs=12, sm=12, md=6, lg=4
