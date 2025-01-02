@@ -214,14 +214,14 @@ def update_payload_mass(customer):
         return f"Total Payload Mass for {customer}: {total_mass} kg"
     return "Select a customer to see total payload mass"
 
-@app.callback(
+""" @app.callback(
     Output("avg-payload-mass-output", "children"),
     Input("avg-payload-mass-output", "id")
 )
 def update_avg_payload_mass(_):
     avg_mass = fetch_avg_payload_mass_by_booster("F9 v1.1%")
     return f"Average Payload Mass for Booster Version F9 v1.1: {avg_mass} kg"
-
+ """
 @app.callback(
     Output("mission-outcomes-output", "children"),
     Input("mission-outcomes-output", "id")
