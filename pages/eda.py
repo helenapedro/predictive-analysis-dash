@@ -1,9 +1,8 @@
 import os
-from dash import dcc, html, Input, Output, State, callback
+from dash import dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 
 # Construct the absolute path to the CSV file
 base_dir = os.path.dirname(os.path.abspath(__file__))
