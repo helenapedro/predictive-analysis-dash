@@ -1,3 +1,4 @@
+import dash
 from dash import dcc, html, Input, Output, State, callback
 import dash_bootstrap_components as dbc
 from utils.queries import (
@@ -9,7 +10,10 @@ from utils.queries import (
     fetch_failed_landings
 )
 
-layout = dbc.Container([
+app= dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
+
+app.layout = dbc.Container([
     dbc.Row([
         dbc.Col(html.H1("EDA with SQL", className="text-center text-primary mb-4"), 
                 width=12
@@ -146,7 +150,7 @@ layout = dbc.Container([
 ], fluid=True)
 
 
-@callback(
+@app.callback(
     [Output("code-output", "children"), Output("code-output", "style")],
     [Input("toggle-code-btn", "n_clicks")],
 )
@@ -181,7 +185,7 @@ def fetch_launch_count(launch_site):
     return "", {"display": "none"}
 
 
-@callback(
+@app.callback(
     Output("launch-site-list", "children"),
     Input("launch-site-list", "id")
 )
@@ -200,7 +204,7 @@ def update_launch_count(n_clicks, site):
         return f"Launch count for {site}: {count}"
     return "Enter a site and click Get Count"
 
-@callback(
+@app.callback(
     Output("payload-mass-output", "children"),
     Input("customer-dropdown", "value")
 )
@@ -210,7 +214,7 @@ def update_payload_mass(customer):
         return f"Total Payload Mass for {customer}: {total_mass} kg"
     return "Select a customer to see total payload mass"
 
-@callback(
+@app.callback(
     Output("avg-payload-mass-output", "children"),
     Input("avg-payload-mass-output", "id")
 )
@@ -218,7 +222,7 @@ def update_avg_payload_mass(_):
     avg_mass = fetch_avg_payload_mass_by_booster("F9 v1.1%")
     return f"Average Payload Mass for Booster Version F9 v1.1: {avg_mass} kg"
 
-@callback(
+@app.callback(
     Output("mission-outcomes-output", "children"),
     Input("mission-outcomes-output", "id")
 )
@@ -226,10 +230,13 @@ def update_mission_outcomes(_):
     outcomes = fetch_mission_outcomes()
     return [html.P(f"{outcome[0]}: {outcome[1]}") for outcome in outcomes]
 
-@callback(
+@app.callback(
     Output("failed-landings-output", "children"),
     Input("failed-landings-output", "id")
 )
 def update_failed_landings(_):
     landings = fetch_failed_landings()
     return [html.P(f"Landing Outcome: {landing[0]}, Booster Version: {landing[1]}, Launch Site: {landing[2]}") for landing in landings]
+
+if __name__ == "__main__":
+    app.run_server(debug=True)

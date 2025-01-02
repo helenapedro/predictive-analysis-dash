@@ -27,7 +27,7 @@ def create_section(title, graph_id, description, conclusions):
 layout = dbc.Container(
     [
         dbc.Row([
-            dbc.Col(
+            dbc.Col([
                 dbc.Card([
                     dbc.CardHeader(
                         html.H1(
@@ -112,13 +112,12 @@ layout = dbc.Container(
                         ),
                     ]),    
                 ]),
-            )
+            ]),
         ]),
     ], 
     fluid=True,
     className="mt-5"
 )
-
 
 # Callbacks
 @callback(
@@ -134,26 +133,34 @@ layout = dbc.Container(
 def update_graphs(_):
     # Relationship between Payload and Flight Number
     fig1 = px.scatter(df, x="FlightNumber", y="PayloadMass", color="Class", title="Relationship between Payload Mass (kg) and Flight Number")
+    fig1.update_layout(title_font=dict(size=20, color='blue', family="Arial"))
 
     # Relationship between Launch Site and Flight Number
     fig2 = px.scatter(df, x="FlightNumber", y="LaunchSite", color="Class", title="Relationship between Launch Site and Flight Number")
+    fig2.update_layout(title_font=dict(size=20, color='blue', family="Arial"))
 
     # Relationship between Payload and Launch Site
     fig3 = px.scatter(df, x="PayloadMass", y="LaunchSite", color="Class", title="Relationship between Payload and Launch Site")
+    fig3.update_layout(title_font=dict(size=20, color='blue', family="Arial"))
 
     # Success Rate by Orbit Type
     orbit_success = df.groupby('Orbit')['Class'].mean().reset_index()
     fig4 = px.bar(orbit_success, x='Orbit', y='Class', title='Success Rate by Orbit Type')
+    fig4.update_layout(title_font=dict(size=20, color='blue', family="Arial"))
 
     # Relationship between Flight Number and Orbit Type
     fig5 = px.scatter(df, x="FlightNumber", y="Orbit", color="Class", title="Relationship between Flight Number and Orbit Type")
+    fig5.update_layout(title_font=dict(size=20, color='blue', family="Arial"))
 
     # Relationship between Payload and Orbit Type
     fig6 = px.scatter(df, x="PayloadMass", y="Orbit", color="Class", title="Relationship between Payload and Orbit Type")
+    fig6.update_layout(title_font=dict(size=20, color='blue', family="Arial"))
 
     # Launch Success Yearly Trend
     df['Year'] = pd.to_datetime(df['Date']).dt.year
     yearly_trend = df.groupby('Year')['Class'].mean().reset_index()
     fig7 = px.line(yearly_trend, x='Year', y='Class', title='Launch Success Yearly Trend')
+    fig7.update_layout(title_font=dict(size=20, color='blue', family="Arial"))
 
     return fig1, fig2, fig3, fig4, fig5, fig6, fig7
+
