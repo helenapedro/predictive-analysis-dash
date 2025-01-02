@@ -133,6 +133,23 @@ app.layout = dbc.Container([
             ], xs=12, sm=12, md=6, lg=4),
         ], className="justify-content-center"),
 
+
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.Div([
+                            html.I(className="fas fa-weight-hanging me-2"),
+                            "Average Payload Mass"
+                        ], className="d-flex align-items-center bg-secondary text-white"),
+                    ),
+                    dbc.CardBody([
+                        dbc.Spinner(html.Div(id="avg-payload-mass-output", className="text-muted"))
+                    ])
+                ], className="mb-4 shadow-lg hoverable")
+            ], xs=12, sm=12, md=6, lg=4),
+        ], className="justify-content-center"),
+
         dbc.Row([
             dbc.Col([
                 dbc.Card([
@@ -159,6 +176,22 @@ def toggle_code(n_clicks):
         if n_clicks % 2 == 1:
             code_snippets = """
 ```python
+import pymysql
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Database connection function
+def get_connection():
+    return pymysql.connect(
+        host=os.getenv('DB_HOST'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME')
+    )
+    
 # Fetch Unique Launch Sites
 def fetch_unique_launch_sites():
     connection = get_connection()
@@ -214,14 +247,14 @@ def update_payload_mass(customer):
         return f"Total Payload Mass for {customer}: {total_mass} kg"
     return "Select a customer to see total payload mass"
 
-""" @app.callback(
+@app.callback(
     Output("avg-payload-mass-output", "children"),
     Input("avg-payload-mass-output", "id")
 )
 def update_avg_payload_mass(_):
     avg_mass = fetch_avg_payload_mass_by_booster("F9 v1.1%")
     return f"Average Payload Mass for Booster Version F9 v1.1: {avg_mass} kg"
- """
+
 @app.callback(
     Output("mission-outcomes-output", "children"),
     Input("mission-outcomes-output", "id")
