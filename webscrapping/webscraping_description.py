@@ -9,118 +9,56 @@ def create_webscraping_description():
           into a Pandas DataFrame for further analysis.
      """
     code_snippet = """
-     from bs4 import BeautifulSoup
-     import pandas as pd
-     import requests
+```python
+    from bs4 import BeautifulSoup
+    import pandas as pd
+    import requests
 
-     # Scraping function to fetch and process the Falcon 9 launches data
-     def fetch_falcon_9_launch_data():
-          url = "https://en.wikipedia.org/w/index.php?title=List_of_Falcon_9_and_Falcon_Heavy_launches&oldid=1027686922"
-          response = requests.get(url)
-          soup = BeautifulSoup(response.text, 'html.parser')
+    # Main scraping function
+    def fetch_falcon_9_launch_data():
+        url = "https://en.wikipedia.org/w/index.php?title=List_of_Falcon_9_and_Falcon_Heavy_launches&oldid=1027686922"
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-          html_tables = soup.find_all('table', class_='wikitable plainrowheaders collapsible')
+        # Locate and parse the target table
+        html_tables = soup.find_all('table', class_='wikitable plainrowheaders collapsible')
+        launch_table = html_tables[2]  # Use the 3rd table containing launch data
 
-          # Extract column names from the header of the third table
-          column_names = []
-          first_launch_table = html_tables[2]
-          tc = first_launch_table.find_all('th')
-          for th in tc:
-               name = extract_column_from_header(th)
-               column_names.append(name)
+        # Extract column names
+        column_names = [extract_column_from_header(th) for th in launch_table.find_all('th')]
 
-          # dictionary to hold the scraped data, initializing with empty lists
-          launch_dict = {name: [] for name in column_names}
-          launch_dict['Flight No.'] = []
-          launch_dict['Launch site'] = []
-          launch_dict['Payload'] = []
-          launch_dict['Payload mass'] = []
-          launch_dict['Orbit'] = []
-          launch_dict['Customer'] = []
-          launch_dict['Launch outcome'] = []
-          launch_dict['Version Booster'] = []
-          launch_dict['Booster landing'] = []
-          launch_dict['Date'] = []
-          launch_dict['Time'] = []
+        # Initialize the data dictionary
+        launch_data = {name: [] for name in column_names}
 
-          # Scrape the data row by row
-          for table in html_tables:
-               for rows in table.find_all("tr"):
-                    if rows.th:
-                         flight_number = rows.th.string.strip() if rows.th.string else None
-                         if flight_number and flight_number.isdigit():
-                              row = rows.find_all('td')
+        # Scrape rows
+        for row in launch_table.find_all('tr'):
+            if row.th and row.th.string and row.th.string.strip().isdigit():
+                cells = row.find_all('td')
 
-                              # Get Date and Time separately
-                              datatimelist = date_time(row[0])
-                              date = datatimelist[0].strip(',')
-                              launch_dict['Date'].append(date)
-                              time = datatimelist[1]
-                              launch_dict['Time'].append(time)
+                # Extract key data points
+                date, time = parse_date_time(cells[0])
+                launch_data['Date'].append(date)
+                launch_data['Time'].append(time)
+                launch_data['Payload'].append(cells[3].a.string if cells[3].a else 'N/A')
+                launch_data['Orbit'].append(cells[5].a.string if cells[5].a else 'N/A')
+                launch_data['Launch outcome'].append(cells[7].string.strip() if cells[7].string else 'N/A')
 
-                              # Booster version
-                              bv = booster_version(row[1])
-                              launch_dict['Version Booster'].append(bv or row[1].a.string)
+        # Convert to DataFrame
+        return pd.DataFrame(launch_data)
 
-                              # Other columns
-                              launch_dict['Launch site'].append(row[2].a.string)
-                              launch_dict['Payload'].append(row[3].a.string)
-                              launch_dict['Payload mass'].append(get_mass(row[4]))
-                              launch_dict['Orbit'].append(row[5].a.string)
-                              launch_dict['Customer'].append(row[6].a.string if row[6].a else '')
-                              
-                              # Handling NoneType for Launch Outcome
-                              launch_outcome = row[7].string.strip() if row[7].string else 'N/A'
-                              launch_dict['Launch outcome'].append(launch_outcome)
+    # Helper function: Extract column names
+    def extract_column_from_header(header):
+        for tag in ['br', 'a', 'sup']:
+            if getattr(header, tag):
+                getattr(header, tag).extract()
+        return ' '.join(header.stripped_strings)
 
-                              launch_dict['Booster landing'].append(landing_status(row[8]))
+    # Helper function: Parse date and time
+    def parse_date_time(cell):
+        date_time = list(cell.stripped_strings)
+        return date_time[0].strip(','), date_time[1] if len(date_time) > 1 else 'N/A'
+```"""
 
-          # To ensure all columns are the same length
-          max_length = max(len(lst) for lst in launch_dict.values() if lst is not None)  # Find the maximum length, excluding None
-          for key, value in launch_dict.items():
-               # Append None (or any placeholder) to lists that are shorter
-               while len(value) < max_length:
-                    value.append(None)
-
-          # To convert the dictionary into a DataFrame
-          df = pd.DataFrame(launch_dict)
-
-          return df
-
-     # Scraping Functions
-     def date_time(table_cells):
-          return [data_time.strip() for data_time in list(table_cells.strings)][0:2]
-
-     def booster_version(table_cells):
-          out = ''.join([booster_version for i, booster_version in enumerate(table_cells.strings) if i % 2 == 0][0:-1])
-          return out
-
-     def landing_status(table_cells):
-          return [i for i in table_cells.strings][0]
-
-     def get_mass(table_cells):
-          mass = unicodedata.normalize("NFKD", table_cells.text).strip()
-          if mass:
-               mass.find("kg")
-               new_mass = mass[0:mass.find("kg") + 2]
-          else:
-               new_mass = 0
-          return new_mass
-
-     def extract_column_from_header(row):
-          if row.br:
-               row.br.extract()
-          if row.a:
-               row.a.extract()
-          if row.sup:
-               row.sup.extract()
-
-          column_name = ' '.join(row.contents)
-
-          if not (column_name.strip().isdigit()):
-               column_name = column_name.strip()
-               return column_name
-    """
     card_id = "webscraping-data-description"
     
     # Pass all required arguments to the function
