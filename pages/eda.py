@@ -5,15 +5,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-""" from utils.queries import (
-    fetch_unique_launch_sites, 
-    fetch_launch_count, 
-    fetch_payload_mass_by_customer,
-    fetch_avg_payload_mass_by_booster,
-    fetch_mission_outcomes,
-    fetch_failed_landings
-) """
-
 # Construct the absolute path to the CSV file
 base_dir = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(base_dir, '../data/dataset_part_2.csv')
@@ -30,8 +21,8 @@ def create_section(title, graph_id, description, conclusions):
                 html.P(description),
                 html.Ul([html.Li(conclusion) for conclusion in conclusions])
             ])
-        ], xs=12, sm=12, md=12, lg=6)
-    ], className="justify-content-center")
+        ])
+    ])
 
 layout = dbc.Container(
     [
@@ -48,7 +39,8 @@ layout = dbc.Container(
                     dbc.CardBody([
                         html.P(
                             "This page allows you to explore SpaceX launch data through interactive data visualization. "
-                            "The visualizations provide insights into the relationship between various factors and the success of launches."
+                            "The visualizations provide insights into the relationship between various factors and the success of launches.",
+                            className="card-text"
                         ),
 
                         create_section(
@@ -63,7 +55,7 @@ layout = dbc.Container(
                             'launchsite-flight-graph',
                             "From the plot above it can be concluded that:",
                             [
-                                "CCAFS SLC 40 is the most common launch site.",
+                                "CCSFS SLC 40 is the most common launch site.",
                                 "The larger the flight amount at a launch site, the greater the success rate at a launch site.",
                                 "Launches have a 66.6% success rate."
                             ]
@@ -141,7 +133,7 @@ layout = dbc.Container(
 )
 def update_graphs(_):
     # Relationship between Payload and Flight Number
-    fig1 = px.scatter(df, x="FlightNumber", y="PayloadMass", color="Class", title="Relationship between Payload and Flight Number")
+    fig1 = px.scatter(df, x="FlightNumber", y="PayloadMass", color="Class", title="Relationship between Payload Mass (kg) and Flight Number")
 
     # Relationship between Launch Site and Flight Number
     fig2 = px.scatter(df, x="FlightNumber", y="LaunchSite", color="Class", title="Relationship between Launch Site and Flight Number")
@@ -165,23 +157,3 @@ def update_graphs(_):
     fig7 = px.line(yearly_trend, x='Year', y='Class', title='Launch Success Yearly Trend')
 
     return fig1, fig2, fig3, fig4, fig5, fig6, fig7
-
-
-""" @callback(
-    Output("launch-site-list", "children"),
-    Input("launch-site-list", "id")
-)
-def update_launch_sites(_):
-    sites = fetch_unique_launch_sites()
-    return [html.Li(site, className="list-group-item") for site in sites]
-
-@callback(
-    Output("launch-count-output", "children"),
-    Input("count-btn", "n_clicks"),
-    State("site-input", "value")
-)
-def update_launch_count(n_clicks, site):
-    if n_clicks and site:
-        count = fetch_launch_count(site)
-        return f"Launch count for {site}: {count}"
-    return "Enter a site and click Get Count" """
