@@ -74,7 +74,7 @@ def create_home_page():
                                 ])
                             ),
                         ],  xs=12, sm=12, md=6, lg=6, xl=6),
-                    ], className='w-100 shadow hoverable'),
+                    ]),
                 ],
                 className="mb-4 shadow"
             ),
