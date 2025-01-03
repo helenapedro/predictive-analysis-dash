@@ -9,8 +9,7 @@ def create_navibar():
                 dbc.Collapse(
                     dbc.Nav(
                         [
-                            dbc.NavItem(dbc.NavLink("Dashboard", href="/", className="nav-link")),
-                            dbc.NavItem(dbc.NavLink("EDA", href="/eda", className="nav-link")),
+                            dbc.NavItem(dbc.NavLink("EDA", href="/", className="nav-link")),
                             dbc.NavItem(dbc.NavLink("Webscraping", href="/scraping", className="nav-link")),
                             dbc.NavItem(dbc.NavLink("About", href="#", className="nav-link", id="about-link")),
                         ],

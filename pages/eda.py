@@ -1,9 +1,10 @@
 import os
 from dash import dcc, html, Input, Output, State, callback
 import dash_bootstrap_components as dbc
-import pandas as pd
 import plotly.express as px
+import pandas as pd
 
+from pages.home import create_home_page
 from pages.data_exploration import fetch_and_process_data, create_exploration_page
 from utils.queries import (
     fetch_unique_launch_sites, 
@@ -36,16 +37,7 @@ rocket_df, launchpad_df, payload_df, core_df = fetch_and_process_data()
 
 layout = dbc.Container(
     [
-        # Title Section
-        dbc.Row(
-            dbc.Col(
-                html.H1(
-                    "SpaceX Launch Data Explorer",
-                    className="text-center text-primary mb-4"
-                ),
-            ),
-            className="mb-5"
-        ),
+        create_home_page(),
 
         # Visualization Section
         dbc.Row(
@@ -60,6 +52,7 @@ layout = dbc.Container(
                                     style={'color': '#4CAF50'}
                                 ),
                             ),
+
                             dbc.CardBody(
                                 [
                                     html.P(
@@ -277,15 +270,19 @@ layout = dbc.Container(
                             dbc.Spinner(html.Div(id="failed-landings-output", className="text-muted"))
                         ])
                     ], className="mb-4 shadow-lg hoverable"),
-
-
                 ],
                 xs=12, sm=12, md=6, lg=4
             ),
         ]),
 
-        create_exploration_page(rocket_df, launchpad_df, payload_df, core_df)
-        
+        create_exploration_page(rocket_df, launchpad_df, payload_df, core_df),
+
+        # Footer
+        html.Footer(
+            "@2021, Helena Pedro",
+            className='text-center text-muted mt-5',
+        ),
+
     ], 
     fluid=True,
     className="mt-5"

@@ -20,6 +20,17 @@ app.layout = dbc.Container([
         )
     ]),
 
+     # Title Section
+        dbc.Row(
+            dbc.Col(
+                html.H1(
+                    "SpaceX Launch Data Explorer",
+                    className="text-center text-primary mb-4"
+                ),
+            ),
+            className="mb-5"
+        ),
+
     dbc.Row([
         dbc.Col([
             dbc.Card([

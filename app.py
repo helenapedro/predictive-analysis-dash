@@ -2,7 +2,6 @@ from dash import Dash, html, dcc, Input, Output, State
 import dash
 import dash_bootstrap_components as dbc
 from sidebar import create_navibar
-from pages.home import create_home_page
 from pages.about import create_about_content
 from pages.webscraping import layout as scraping_layout
 from pages.eda import layout as eda_layout 
@@ -131,13 +130,11 @@ def toggle_summaries(toggle_summary_n, toggle_initial_n, toggle_processed_n, sum
 )
 def display_page(pathname):
     if pathname == "/":
-        return create_home_page()
-    elif pathname == "/about":
-        return create_about_content()
+        return eda_layout
     elif pathname == "/scraping":
         return scraping_layout
-    elif pathname == "/eda":
-        return eda_layout
+    elif pathname == "/about":
+        return create_about_content()
     else:
         return html.H1("404: Page Not Found", className="error")
 
