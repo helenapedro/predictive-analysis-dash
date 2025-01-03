@@ -31,9 +31,9 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
             dbc.Row(
                 dbc.Col(
                     html.H1(
-                        'EDA with Rest API',
-                        className='text-center mb-4',
-                        style={'color': '#4CAF50'}
+                        'EDA with REST API',
+                        className='text-center mb-4 fw-bold',
+                        style={'color': '#4CAF50', 'fontSize': '2.5rem'}
                     )
                 )
             ),
@@ -43,12 +43,16 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
                 dbc.Col(
                     dbc.Card(
                         [
-                            dbc.CardHeader(html.H3("API Data Fetching Description")),
+                            dbc.CardHeader(
+                                html.H3("API Data Fetching Description", className="card-title"),
+                                style={'backgroundColor': '#e9ecef'}
+                            ),
                             dbc.CardBody(
-                                create_api_fetching_description()
+                                create_api_fetching_description(),
+                                className="text-muted"
                             )
                         ],
-                        className='mb-4'
+                        className='mb-4 shadow-sm'
                     )
                 )
             ),
@@ -58,12 +62,16 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
                 dbc.Col(
                     dbc.Card(
                         [
-                            dbc.CardHeader(html.H3("Initial Table")),
+                            dbc.CardHeader(
+                                html.H3("Initial Table", className="card-title"),
+                                style={'backgroundColor': '#e9ecef'}
+                            ),
                             dbc.CardBody(
-                                initial_data_layout
+                                initial_data_layout,
+                                className="text-muted"
                             )
                         ],
-                        className='mb-4'
+                        className='mb-4 shadow-sm'
                     )
                 )
             ),
@@ -73,12 +81,16 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
                 dbc.Col(
                     dbc.Card(
                         [
-                            dbc.CardHeader(html.H3("Initial Table Summary")),
+                            dbc.CardHeader(
+                                html.H3("Initial Table Summary", className="card-title"),
+                                style={'backgroundColor': '#e9ecef'}
+                            ),
                             dbc.CardBody(
-                                initial_table_card_summary()
+                                initial_table_card_summary(),
+                                className="text-muted"
                             )
                         ],
-                        className='mb-4'
+                        className='mb-4 shadow-sm'
                     )
                 )
             ),
@@ -95,15 +107,15 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
                             payload_mass_distribution_tab(payloads_df),
                             cores_reuse_tab(cores_df),
                         ],
-                        className='mt-4'
+                        className='custom-tabs',
+                        style={'border': '1px solid #dee2e6', 'borderRadius': '0.25rem'}
                     )
                 )
             )
         ],
         fluid=True,
-        className="mt-5"
+        className="mt-5 px-4"
     )
-
 
 # Fetch and process data
 rockets_df, launchpads_df, payloads_df, cores_df = fetch_and_process_data()

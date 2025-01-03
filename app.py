@@ -88,30 +88,33 @@ def toggle_about_sidebar(n_about_clicks, n_close_clicks, sidebar_style):
         Output("summary-content", "style"),
         Output("initial-table-summary", "style"),
         Output("processed-data-content", "style"),
+        Output("api-summary-content", "children"),
     ],
     [
-        Input("toggle-button-summary", "n_clicks"),
         Input("toggle-button-initial", "n_clicks"),
-        Input("toggle-processed-summary", "n_clicks")
+        Input("toggle-processed-summary", "n_clicks"),
+        Input("toggle-api-button-summary", "n_clicks"),
     ],
     [
         State("summary-content", "style"),
         State("initial-table-summary", "style"),
-        State("processed-data-content", "style")
+        State("processed-data-content", "style"),
+        State("api-summary-content", "style"),
     ],
 )
-def toggle_summaries(toggle_summary_n, toggle_initial_n, toggle_processed_n, summary_style, initial_style, processed_style):
+def toggle_summaries(toggle_summary_n, toggle_initial_n, toggle_processed_n, api_n_clicks, summary_style, initial_style, processed_style, api_summary_style):
     from dash import callback_context
 
     # Initialize styles if None (first load)
     summary_style = summary_style or {"display": "none"}
     initial_style = initial_style or {"display": "none"}
     processed_style = processed_style or {"display": "none"}
+    api_summary_style = api_summary_style or {"display": "none"}
 
     # Get the ID of the triggered button
     ctx = callback_context
     if not ctx.triggered:
-        return summary_style, initial_style, processed_style
+        return summary_style, initial_style, processed_style, api_summary_style
 
     button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
@@ -122,8 +125,46 @@ def toggle_summaries(toggle_summary_n, toggle_initial_n, toggle_processed_n, sum
         initial_style["display"] = "block" if toggle_initial_n % 2 == 1 else "none"
     elif button_id == "toggle-processed-summary":
         processed_style["display"] = "block" if toggle_processed_n % 2 == 1 else "none"
+    elif button_id == "toggle-api-button-summary":
+        if api_n_clicks and api_n_clicks % 2 == 1:
+            code_snippet = """
+```python
+import requests
+import logging
 
-    return summary_style, initial_style, processed_style
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+BASE_URL = {
+    'spacex': 'https://api.spacexdata.com/v4/',
+}
+
+# Generalized fetch function
+def fetch_data(endpoint, base_url_type='spacex'):
+    base_url = BASE_URL.get(base_url_type)
+    if not base_url:
+        logging.error(f"Invalid base URL type: {base_url_type}")
+        return None
+
+    url = f"{base_url}{endpoint}"
+    try:
+        logging.info(f"Fetching data from {url}")
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error fetching data from {url}: {e}")
+        return None
+
+# Example fetch calls:
+fetch_rockets_data = fetch_data('rockets')
+fetch_launchpads_data = fetch_data('launchpads')
+```
+            """
+            api_summary_style["display"] = "block"
+        else:
+            api_summary_style["display"] = "none"
+    return summary_style, initial_style, processed_style, api_summary_style
 
 
 

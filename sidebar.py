@@ -7,7 +7,7 @@ def create_navibar():
             [
                 # Brand Title
                 dbc.NavbarBrand(
-                    "Rocket Launch Predictive Analysis", 
+                    "Predictive Analysis", 
                     className="ms-2 fw-bold", 
                     style={"color": "#007bff", "fontSize": "1.5rem"}
                 ),
