@@ -8,7 +8,11 @@ from pages.eda import layout as eda_layout
 
 app = Dash(
     __name__,
-    external_stylesheets=["https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"]
+    external_stylesheets=[
+        dbc.themes.BOOTSTRAP,
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css", 
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    ]
 )
 
 server = app.server
