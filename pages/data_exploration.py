@@ -31,7 +31,7 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
             dbc.Row(
                 dbc.Col(
                     html.H1(
-                        'Data Exploration',
+                        'EDA with Rest API',
                         className='text-center mb-4',
                         style={'color': '#4CAF50'}
                     )

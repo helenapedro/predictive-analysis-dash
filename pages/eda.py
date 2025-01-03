@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
 
+from pages.data_exploration import fetch_and_process_data, create_exploration_page
 from utils.queries import (
     fetch_unique_launch_sites, 
     fetch_launch_count, 
@@ -30,6 +31,8 @@ def create_section(title, graph_id, description, conclusions):
             ])
         ])
     ])
+
+rocket_df, launchpad_df, payload_df, core_df = fetch_and_process_data()
 
 layout = dbc.Container(
     [
@@ -280,6 +283,9 @@ layout = dbc.Container(
                 xs=12, sm=12, md=6, lg=4
             ),
         ]),
+
+        create_exploration_page(rocket_df, launchpad_df, payload_df, core_df)
+        
     ], 
     fluid=True,
     className="mt-5"

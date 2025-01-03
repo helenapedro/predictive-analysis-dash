@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 from sidebar import create_navibar
 from pages.home import create_home_page
 from pages.about import create_about_content
-from pages.data_exploration import create_exploration_page, fetch_and_process_data
 from pages.webscraping import layout as scraping_layout
 from pages.eda import layout as eda_layout 
 
@@ -16,9 +15,6 @@ app = Dash(
 server = app.server
 
 app.config.suppress_callback_exceptions = True
-
-# Fetch and preprocess data once at the start of the app
-rockets_df, launchpads_df, payloads_df, cores_df = fetch_and_process_data()
 
 # App Layout
 app.layout = html.Div(
@@ -138,8 +134,6 @@ def display_page(pathname):
         return create_home_page()
     elif pathname == "/about":
         return create_about_content()
-    elif pathname == "/exploration":
-        return create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df)
     elif pathname == "/scraping":
         return scraping_layout
     elif pathname == "/eda":
