@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data.clean_data import fetch_and_clean_launch_data
 from data.data_fetch import fetch_initial_data, fetch_and_process_data
 from data.row_data import fetch_initial_data_layout
-from utils.api_description import create_api_fetching_description
+from utils.api_description import eda_rest_api
 from utils.initial_table_card_summary import initial_table_card_summary
 
 # Import tabs
@@ -27,33 +27,9 @@ launch_data = fetch_and_clean_launch_data()
 def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
     return dbc.Container(
         [
-            # Page Title
             dbc.Row(
                 dbc.Col(
-                    html.H1(
-                        'EDA with REST API',
-                        className='text-center mb-4 fw-bold',
-                        style={'color': '#4CAF50', 'fontSize': '2.5rem'}
-                    )
-                )
-            ),
-
-            # API Fetching Description
-            dbc.Row(
-                dbc.Col(
-                    dbc.Card(
-                        [
-                            dbc.CardHeader(
-                                html.H3("API Data Fetching Description", className="card-title"),
-                                style={'backgroundColor': '#e9ecef'}
-                            ),
-                            dbc.CardBody(
-                                create_api_fetching_description(),
-                                className="text-muted"
-                            )
-                        ],
-                        className='mb-4 shadow-sm'
-                    )
+                    eda_rest_api(),
                 )
             ),
 

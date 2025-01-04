@@ -1,18 +1,30 @@
-from dash import dcc, Input, Output, State, callback
+from dash import dcc, html, Input, Output, State, callback
 import dash_bootstrap_components as dbc
 
-def create_api_fetching_description():
-    description_text = (
-        "This dataset was gathered using a GET request from the SpaceX REST API. "
-        "Click the button to view the code snippet and explore how this data was fetched."
-    )
-
+def eda_rest_api():
     return dbc.Card(
         [
-            dbc.CardHeader("API Fetching"),
+            dbc.CardHeader(
+                html.H1(
+                    "EDA with REST API", 
+                    className="card-title text-center fw-bold",
+                    style={'color': '#4CAF50'}
+                ),
+            ),
+
+            html.Div(
+                [
+                    html.P(
+                        "This dataset was gathered using a GET request from the SpaceX REST API. "
+                        "Click the button to view the code snippet and explore how this data was fetched.",
+                        className="text-center text-muted",
+                    )
+                ],
+                className="hero-section",
+            ),
+
             dbc.CardBody(
                 [
-                    dcc.Markdown(description_text),
                     dbc.Button(
                         "View/Hide Code Snippet",
                         id="toggle-api-button-summary",
@@ -23,7 +35,7 @@ def create_api_fetching_description():
                 ]
             ),
         ],
-        className="mb-3",
+        className="mb-4 shadow-sm",
     )
 
 
