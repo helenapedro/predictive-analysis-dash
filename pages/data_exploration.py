@@ -42,10 +42,11 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
                                 html.H3("Initial Table", className="card-title"),
                                 style={'backgroundColor': '#e9ecef'}
                             ),
+
                             dbc.CardBody(
                                 initial_data_layout,
                                 className="text-muted"
-                            )
+                            ),
                         ],
                         className='mb-4 shadow-sm'
                     )
@@ -61,10 +62,8 @@ def create_exploration_page(rockets_df, launchpads_df, payloads_df, cores_df):
                                 html.H3("Initial Table Summary", className="card-title"),
                                 style={'backgroundColor': '#e9ecef'}
                             ),
-                            dbc.CardBody(
-                                initial_table_card_summary(),
-                                className="text-muted"
-                            )
+
+                            initial_table_card_summary(),
                         ],
                         className='mb-4 shadow-sm'
                     )

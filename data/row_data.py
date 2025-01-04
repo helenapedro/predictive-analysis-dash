@@ -9,75 +9,91 @@ def fetch_initial_data_layout():
     if dataframe.empty:
         return html.Div("No data available to display", style={"textAlign": "center", "padding": "20px"})
 
-    return dbc.Col(
+    return dbc.Row(
         [
-            dash_table.DataTable(
-                id='spacex-data-table',
-                columns=[{"name": col, "id": col} for col in dataframe.columns],
-                data=dataframe.to_dict('records'),
-                style_table={'overflowX': 'auto'},
-                style_cell={
-                    'textAlign': 'left',
-                    'padding': '10px',
-                    'whiteSpace': 'normal',
-                },
-                style_header={
-                    'backgroundColor': 'rgb(230, 230, 230)',
-                    'fontWeight': 'bold'
-                },
-                style_data={
-                    'backgroundColor': 'rgb(250, 250, 250)',
-                },
-            ),
-            dbc.Button(
-                "View/Hide Code Snippet",
-                id="toggle-button-initial",
-                className="btn btn-primary"
-            ),
-            dcc.Markdown(id="code-snippet-div", style={"display": "none"}), 
-            dcc.Store(id="snippet-visible", data=False),  # Store for visibility state  
+            dbc.Col(
+                [
+                    dbc.Button(
+                        "View/Hide Code Snippet",
+                        id="toggle-button-initial",
+                        className="btn btn-primary mb-3"
+                    ),
 
+                    dbc.Collapse(
+                        dcc.Markdown(id="code-snippet-div"), 
+                        id="collapse-snippet",
+                        is_open=False,
+                    ),
+
+
+                    dash_table.DataTable(
+                        id='spacex-data-table',
+                        columns=[{"name": col, "id": col} for col in dataframe.columns],
+                        data=dataframe.to_dict('records'),
+                        page_size=5,
+                        style_table={'overflowX': 'auto'},
+                        style_cell={
+                            'textAlign': 'left',
+                            'padding': '10px',
+                            'whiteSpace': 'normal',
+                        },
+                        style_header={
+                            'backgroundColor': 'rgb(230, 230, 230)',
+                            'fontWeight': 'bold'
+                        },
+                        style_data={
+                            'backgroundColor': 'rgb(250, 250, 250)',
+                        },
+                    ),
+
+                    # Hero Section
+                    html.Div(
+                            [
+                                html.P(
+                                    """
+                                        From the initial data, I observed that many columns, such as the rocket column, 
+                                        only contain ID numbers without additional information. Therefore, I used the 
+                                        SpaceX API to enrich this data by extracting detailed information based on these IDs.
+                                    """,
+                                    className='text-center text-muted'
+                                ),
+                            ],
+                            className="hero-section"
+                    ),
+                ]
+            ),
+            
         ]
     )
 
 # Define the callback to toggle the code snippet visibility
 @callback(
-    [Output("code-snippet-div", "children"), Output("code-snippet-div", "style"), Output("snippet-visible", "data")],
+    [Output("code-snippet-div", "children"), Output("collapse-snippet", "is_open")],
     Input("toggle-button-initial", "n_clicks"),
-    State("snippet-visible", "data"),
+    State("collapse-snippet", "is_open"),
     prevent_initial_call=True
 )
-def update_initial_data(n_clicks, is_visible):
-    if n_clicks is None:
-        # Preventing callback from triggering before any click
-        return "", {"display": "none"}, is_visible
-
-    # Toggle visibility state
-    new_visibility = not is_visible
-
-    if new_visibility:
+def update_initial_data(n_clicks, is_open):
+    if n_clicks:
         code_snippet = """
 ```python
 import pandas as pd
-from utils.data import fetch_initial_data
+from utils.data import fetch_data_from_api
 
-def fetch_initial_data():
-    initial_data = fetch_initial_data()
-    if initial_data:
-        df = pd.DataFrame(initial_data)
+def fetch_table():
+    data = fetch_data_from_api()
+    if data:
+        df = pd.DataFrame(data)
 
         df = df.map(
             lambda x: str(x) if not isinstance(x, (str, int, float, bool, type(None))) else x
         )
 
         pd.set_option('display.max_columns', None)
-        return df.head(5)
+        return df
     else:
-        return pd.DataFrame(columns=["Column1", "Column2", "Column3"])
+        return pd.DataFrame()
 ```
     """
-        style = {"display": "block"}
-    else:
-        code_snippet = ""
-        style = {"display": "none"}
-    return code_snippet, style, new_visibility
+        return code_snippet, not is_open
+    return "", is_open

@@ -11,9 +11,9 @@ def fetch_initial_data():
         )
 
         pd.set_option('display.max_columns', None)
-        return df.head(5)
+        return df
     else:
-        return pd.DataFrame(columns=["Column1", "Column2", "Column3"]) 
+        return pd.DataFrame(columns=["name", "success", "payloads", "launchpad", "flight_number", "cores"]) 
 
 
 def fetch_and_process_data():
