@@ -62,6 +62,27 @@ def toggle_navbar(n_clicks, is_open):
         return not is_open
     return is_open
 
+# Callback to toggle the sidebar visibility
+@app.callback(
+    Output("about-sidebar", "style"),
+    [Input("about-link", "n_clicks"), Input("close-sidebar", "n_clicks")],
+    State("about-sidebar", "style"),
+)
+def handle_sidebar(about_n, close_n, style):
+    from dash import callback_context
+    
+    ctx = callback_context
+    if not ctx.triggered:
+        return style
+    
+    # Identify triggered input
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    if triggered_id == "about-link":
+        style["left"] = "0px"  # Show sidebar
+    elif triggered_id == "close-sidebar":
+        style["left"] = "-320px"  # Hide sidebar
+    return style
+
 # Unified callback for toggle buttons
 @app.callback(
     [
@@ -97,8 +118,6 @@ def toggle_summaries(toggle_initial_n, toggle_processed_n, initial_style, proces
     elif button_id == "toggle-processed-summary":
         processed_style["display"] = "block" if toggle_processed_n % 2 == 1 else "none"
     return initial_style, processed_style, ""
-
-
 
 # Page Navigation
 @app.callback(
