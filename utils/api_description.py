@@ -6,7 +6,7 @@ def create_api_fetching_description():
         "This dataset was gathered using a GET request from the SpaceX REST API. "
         "Click the button to view the code snippet and explore how this data was fetched."
     )
-    
+
     return dbc.Card(
         [
             dbc.CardHeader("API Fetching"),
@@ -14,28 +14,31 @@ def create_api_fetching_description():
                 [
                     dcc.Markdown(description_text),
                     dbc.Button(
-                        "View Code Snippet",
+                        "View/Hide Code Snippet",
                         id="toggle-api-button-summary",
                         className="btn btn-primary",
                     ),
-                    dcc.Markdown(id="api-summary-content", style={"display": "none"})
+                    dcc.Markdown(id="api-summary-content", style={"display": "none"}),
+                    dcc.Store(id="api-snippet-visible", data=False),  # Store for visibility state
                 ]
             ),
         ],
         className="mb-3",
     )
-     
+
+
 @callback(
-    [Output("api-summary-content", "children"), Output("api-summary-content", "style")],
+    [Output("api-summary-content", "children"), Output("api-summary-content", "style"), Output("api-snippet-visible", "data")],
     Input("toggle-api-button-summary", "n_clicks"),
+    State("api-snippet-visible", "data"),
     prevent_initial_call=True
 )
-def update_api_summary(n_clicks):
-    if n_clicks is None or n_clicks == 0:
-        # Return empty content and hide the Markdown initially
-        return "", {"display": "none"}
-    
-    code_snippet = """
+def update_api_summary(n_clicks, is_visible):
+    # Toggle visibility state
+    new_visibility = not is_visible
+
+    if new_visibility:
+        code_snippet = """
 ```python
 import requests
 import logging
@@ -69,4 +72,8 @@ fetch_rockets_data = fetch_data('rockets')
 fetch_launchpads_data = fetch_data('launchpads')
 ```
     """
-    return code_snippet, {"display": "block"}
+        style = {"display": "block"}
+    else:
+        code_snippet = ""
+        style = {"display": "none"}
+    return code_snippet, style, new_visibility
