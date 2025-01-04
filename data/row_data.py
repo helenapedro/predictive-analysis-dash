@@ -47,7 +47,7 @@ def fetch_initial_data_layout():
     State("snippet-visible", "data"),
     prevent_initial_call=True
 )
-def update_api_summary(n_clicks, is_visible):
+def update_initial_data(n_clicks, is_visible):
     if n_clicks is None:
         # Preventing callback from triggering before any click
         return "", {"display": "none"}, is_visible

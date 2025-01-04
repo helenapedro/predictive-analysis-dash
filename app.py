@@ -85,39 +85,21 @@ def handle_sidebar(about_n, close_n, style):
 
 # Unified callback for toggle buttons
 @app.callback(
-    [
-        Output("initial-table-summary", "style"),
-        Output("processed-data-content", "style"),
-    ],
-    [
-        Input("toggle-button-initial", "n_clicks"),
-        Input("toggle-processed-summary", "n_clicks"),
-    ],
-    [
-        State("initial-table-summary", "style"),
-        State("processed-data-content", "style"),
-    ],
+    Output("processed-data-content", "style"),
+    [Input("toggle-processed-summary", "n_clicks")],
+    [State("processed-data-content", "style")],
 )
-def toggle_summaries(toggle_initial_n, toggle_processed_n, initial_style, processed_style):
-    from dash import callback_context
-
-    # Initialize styles if None (first load)
-    initial_style = initial_style or {"display": "none"}
+def toggle_summaries(toggle_processed_n, processed_style):
+    # Initialize style if None (first load)
     processed_style = processed_style or {"display": "none"}
 
-    # Get the ID of the triggered button
-    ctx = callback_context
-    if not ctx.triggered:
-        return initial_style, processed_style
+    # Toggle logic for the button
+    if toggle_processed_n and toggle_processed_n % 2 == 1:
+        processed_style["display"] = "block"  # Show content
+    else:
+        processed_style["display"] = "none"  # Hide content
 
-    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-
-    # Toggle logic for each button
-    if button_id == "toggle-button-initial":
-        initial_style["display"] = "block" if toggle_initial_n % 2 == 1 else "none"
-    elif button_id == "toggle-processed-summary":
-        processed_style["display"] = "block" if toggle_processed_n % 2 == 1 else "none"
-    return initial_style, processed_style, ""
+    return processed_style
 
 # Page Navigation
 @app.callback(
