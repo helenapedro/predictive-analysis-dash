@@ -45,7 +45,7 @@ def eda_rest_api():
     State("api-snippet-visible", "data"),
     prevent_initial_call=True
 )
-def update_api_summary(is_visible):
+def update_api_summary(n_clicks, is_visible):
     # Toggle visibility state
     new_visibility = not is_visible
 
