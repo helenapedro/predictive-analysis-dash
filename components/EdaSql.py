@@ -9,7 +9,6 @@ from utils.queries import (
     fetch_failed_landings
 )
 
-
 def create_card(header_icon, header_text, body_content, header_bg_class="bg-primary"):
     """Reusable function to create a Bootstrap card."""
     return dbc.Card(
