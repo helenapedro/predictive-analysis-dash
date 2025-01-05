@@ -1,10 +1,10 @@
-import dash
-from dash import html, Input, Output
-import os
 import pandas as pd
 import folium
-from folium.plugins import MarkerCluster, MousePosition
+import os
+from folium.plugins import MarkerCluster
 from folium.features import DivIcon
+from dash import Dash, dcc, html, Input, Output
+from dash_extensions.enrich import DashProxy, Output, Input  
 from math import sin, cos, sqrt, atan2, radians
 
 # Construct the absolute path to the CSV file
@@ -13,98 +13,121 @@ data_path = os.path.join(base_dir, '../data/spacex_launch_geo.csv')
 
 # Load data
 spacex_df = pd.read_csv(data_path)
-spacex_df['marker_color'] = spacex_df['class'].apply(lambda x: 'green' if x == 1 else 'red')
-launch_sites_df = spacex_df.groupby(['Launch Site'], as_index=False).first()[['Launch Site', 'Lat', 'Long']]
+#spacex_df['marker_color'] = spacex_df['class'].apply(lambda x: 'green' if x == 1 else 'red')
+launch_sites_df = spacex_df[['Launch Site', 'Lat', 'Long']].drop_duplicates()
 
-# App initialization
-app = dash.Dash(__name__)
 
-# Helper function to calculate distance
+
+# Distance calculation function using Haversine formula
 def calculate_distance(lat1, lon1, lat2, lon2):
-    R = 6373.0  # Earth's radius in km
+    """Calculate the distance between two latitude-longitude points in kilometers."""
+    R = 6373.0  # Approximate radius of Earth in km
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-    dlat, dlon = lat2 - lat1, lon2 - lon1
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
     a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return R * c
+    distance = R * c
+    return distance
 
-# Folium map generation
-def create_map():
-    nasa_coordinate = [29.559684888503615, -95.0830971930759]
-    site_map = folium.Map(location=nasa_coordinate, zoom_start=5)
+# Initialize the Dash app
+app = DashProxy(__name__)
 
-    # Mark launch sites
-    for _, row in launch_sites_df.iterrows():
-        coordinate = [row['Lat'], row['Long']]
-        circle = folium.Circle(coordinate, radius=1000, color='#000000', fill=True).add_child(
-            folium.Popup(f"{row['Launch Site']} region")
-        )
-        marker = folium.map.Marker(
-            coordinate,
-            icon=DivIcon(
-                icon_size=(20, 20),
-                icon_anchor=(0, 0),
-                html=f'<div style="font-size: 12; color:#d35400;"><b>{row["Launch Site"]}</b></div>'
-            )
-        )
-        site_map.add_child(circle)
-        site_map.add_child(marker)
-
-    # Add success/failure markers
-    marker_cluster = MarkerCluster()
-    site_map.add_child(marker_cluster)
-    for _, record in spacex_df.iterrows():
-        coordinate = [record['Lat'], record['Long']]
-        marker = folium.Marker(
-            coordinate,
-            icon=folium.Icon(color=record['marker_color'])
-        )
-        marker_cluster.add_child(marker)
-
-    # Add distances to proximities
-    proximity_coords = [
-        ([28.57468, -80.65229], [28.573255, -80.646895]),  # Example railway proximity
-        ([28.52361, -80.64857], [28.573255, -80.646895])   # Example coastline proximity
-    ]
-    for coord1, coord2 in proximity_coords:
-        distance = calculate_distance(*coord1, *coord2)
-        folium.PolyLine(locations=[coord1, coord2], weight=1).add_to(site_map)
-        distance_marker = folium.Marker(
-            coord1,
-            icon=DivIcon(
-                icon_size=(20, 20),
-                icon_anchor=(0, 0),
-                html=f'<div style="font-size: 12; color:#d35400;"><b>{distance:.2f} KM</b></div>'
-            )
-        )
-        site_map.add_child(distance_marker)
-
-    # Add mouse position plugin
-    formatter = "function(num) {return L.Util.formatNum(num, 5);};"
-    mouse_position = MousePosition(
-        position='topright',
-        separator=' Long: ',
-        empty_string='NaN',
-        lng_first=False,
-        num_digits=20,
-        prefix='Lat:',
-        lat_formatter=formatter,
-        lng_formatter=formatter
-    )
-    site_map.add_child(mouse_position)
-
-    # Save map to HTML
-    map_file = "spacex_map.html"
-    site_map.save(map_file)
-    return map_file
-
-# App layout
 app.layout = html.Div([
-    html.H1("Interactive Visual Analytics with Folium"),
-    html.Iframe(id='map', srcDoc=open(create_map(), 'r').read(), width='100%', height='600'),
-    html.Div(id='output')
+    html.H1("SpaceX Launch Sites Interactive Map"),
+    dcc.Dropdown(
+        id='launch-site-dropdown',
+        options=[{'label': site, 'value': site} for site in launch_sites_df['Launch Site']],
+        value=launch_sites_df['Launch Site'].iloc[0],
+        placeholder="Select a Launch Site"
+    ),
+    html.Iframe(id='launch-map', width='100%', height='600'),
+    html.Div(id='distance-info', style={'margin-top': '20px', 'font-size': '16px'})
 ])
 
-# Run app
-if __name__ == "__main__":
+@app.callback(
+    Output('launch-map', 'srcDoc'),
+    Output('distance-info', 'children'),
+    Input('launch-site-dropdown', 'value')
+)
+def update_map(selected_site):
+    # If no site is selected, display all launch sites
+    if selected_site is None:
+        # Create a Folium map centered on a default location (e.g., the center of all sites or an average location)
+        site_map = folium.Map(location=[launch_sites_df['Lat'].mean(), launch_sites_df['Long'].mean()], zoom_start=5)
+        
+        # Add markers for all launch sites
+        marker_cluster = MarkerCluster().add_to(site_map)
+        for _, site_info in launch_sites_df.iterrows():
+            coordinate = [site_info['Lat'], site_info['Long']]
+            folium.Marker(
+                coordinate,
+                icon=folium.Icon(color='blue'),
+                popup=f"Launch Site: {site_info['Launch Site']}"
+            ).add_to(marker_cluster)
+
+        # No specific site selected, so no distance info
+        distance_info = "Select a launch site to see the distances to nearby points."
+    else:
+        # Filter data for the selected site
+        site_data = spacex_df[spacex_df['Launch Site'] == selected_site]
+        site_info = launch_sites_df[launch_sites_df['Launch Site'] == selected_site].iloc[0]
+        site_coordinates = [site_info['Lat'], site_info['Long']]
+
+        # Create a Folium map centered on the selected launch site
+        site_map = folium.Map(location=site_coordinates, zoom_start=10)
+        marker_cluster = MarkerCluster().add_to(site_map)
+
+        # Add markers for all launches (success/failure)
+        for _, record in site_data.iterrows():
+            coordinate = [record['Lat'], record['Long']]
+            marker_color = 'green' if record['class'] == 1 else 'red'
+            folium.Marker(
+                coordinate,
+                icon=folium.Icon(color=marker_color),
+                popup=f"Launch Outcome: {'Success' if record['class'] == 1 else 'Failure'}"
+            ).add_to(marker_cluster)
+
+        # Add main launch site marker
+        folium.Marker(
+            site_coordinates,
+            icon=DivIcon(
+                icon_size=(20, 20),
+                icon_anchor=(0, 0),
+                html=f'<div style="font-size: 12px; color: #d35400;"><b>{selected_site}</b></div>'
+            ),
+            popup=f"Launch Site: {selected_site}"
+        ).add_to(site_map)
+
+        # Calculate and display distances to nearby points of interest
+        nearby_points = {
+            'Railway': [28.57468, -80.65229],
+            'Highway': [28.52361, -80.64857],
+            'Coastline': [28.573255, -80.646895],
+            'City': [28.6129, -80.8074]  # Example city coordinate
+        }
+
+        distance_info = "Distances from Launch Site:<br>"
+        for point, coord in nearby_points.items():
+            distance = calculate_distance(site_info['Lat'], site_info['Long'], coord[0], coord[1])
+            distance_info += f"{point}: {distance:.2f} km<br>"
+            # Add a line and marker for the point
+            folium.PolyLine([site_coordinates, coord], color='blue').add_to(site_map)
+            folium.Marker(
+                coord,
+                icon=DivIcon(
+                    icon_size=(20, 20),
+                    icon_anchor=(0, 0),
+                    html=f'<div style="font-size: 12px; color: #d35400;"><b>{distance:.2f} km</b></div>'
+                ),
+                popup=f"{point}: {distance:.2f} km"
+            ).add_to(site_map)
+
+    # Render map as HTML
+    map_html = site_map._repr_html_()
+
+    return map_html, distance_info
+
+
+if __name__ == '__main__':
     app.run_server(debug=True)
