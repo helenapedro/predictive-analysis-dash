@@ -1,4 +1,4 @@
-from dash_extensions.enrich import DashProxy, dcc, html, Output, Input  
+from dash_extensions.enrich import DashProxy, dcc, html, Output, Input
 import dash_bootstrap_components as dbc
 import folium
 from folium.plugins import MarkerCluster
@@ -13,10 +13,10 @@ data_path = os.path.join(base_dir, '../data/spacex_launch_geo.csv')
 
 # Load data
 spacex_df = pd.read_csv(data_path)
-#spacex_df['marker_color'] = spacex_df['class'].apply(lambda x: 'green' if x == 1 else 'red')
 launch_sites_df = spacex_df[['Launch Site', 'Lat', 'Long']].drop_duplicates()
 
-
+# Date filter: Convert to datetime
+spacex_df['Date'] = pd.to_datetime(spacex_df['Date'])
 
 # Distance calculation function using Haversine formula
 def calculate_distance(lat1, lon1, lat2, lon2):
@@ -24,183 +24,191 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6373.0  # Approximate radius of Earth in km
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
     dlon = lon2 - lon1
-    dlat = lat2 - lat1
+    dlat = lon2 - lat1
     a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     distance = R * c
     return distance
 
 # Initialize the Dash app
-app = DashProxy(__name__)
+app = DashProxy(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = dbc.Container(
     [
-          dbc.Row(
-               dbc.Card(
-                    [
-                         dbc.CardHeader(
-                              html.H1(
-                                   "SpaceX Launch Sites Interactive Map",
-                                   className='text-center mb-4',
-                                   style={'color': '#4CAF50'}
-                              )  
-                         ),
-                         # Card to hold the dropdown and map
-                         dbc.Row(
-                              dbc.Col(
-                                   dbc.Card(
-                                        [
-                                        dbc.CardHeader(
-                                             html.H3("Select Launch Site", className="text-center"),
-                                        ),
-                                        dbc.CardBody(
-                                             [
-                                                  # Dropdown for selecting launch site
-                                                  dcc.Dropdown(
-                                                       id='launch-site-dropdown',
-                                                       options=[{'label': site, 'value': site} for site in launch_sites_df['Launch Site']],
-                                                       value=launch_sites_df['Launch Site'].iloc[0],
-                                                       placeholder="Select a Launch Site",
-                                                       style={'width': '100%', 'margin-bottom': '20px'}
-                                                  ),
-                                                  
-                                                  # Description or instructions
-                                                  html.Div(
-                                                       "Select a launch site to view its launch history and nearby distances.",
-                                                       id="map-description",
-                                                       style={'font-size': '16px', 'margin-bottom': '20px'}
-                                                  ),
-                                                  
-                                                  # Iframe to display the map
-                                                  html.Iframe(
-                                                       id='launch-map',
-                                                       width='100%',
-                                                       height='600',
-                                                       style={'border': 'none'}
-                                                  ),
-                                                  
-                                                  # Distance information
-                                                  html.Div(
-                                                       id='distance-info',
-                                                       style={'font-size': '16px', 'margin-top': '20px'}
-                                                  )
-                                             ]
-                                        ),
-                                        ],
-                                        className="mb-4 shadow"
-                                   )
-                              )
-                         ),
-                    ],
-                    className="mb-4 shadow"
-               )
-          ),
-        # Footer with additional links or information
+        # Header Section
         dbc.Row(
             dbc.Col(
-                html.Footer(
-                    [
-                        html.P("@2021, Helena Pedro", className='text-center text-muted'),
-                        html.Div(
-                            [
-                                html.A("GitHub", href="https://github.com/helenapedro", className='me-3'),
-                            ],
-                            className="text-center"
-                        ),
-                    ],
-                    className='mt-5'
+                dbc.Card(
+                    dbc.CardBody(
+                        html.H1(
+                            "SpaceX Launch Sites Interactive Map",
+                            className="text-center text-primary mb-4"
+                        )
+                    ),
+                    className="shadow mb-3"
                 )
             )
         ),
+
+        # Filters Section
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        html.Label("Launch Site:"),
+                        dcc.Dropdown(
+                            id='launch-site-dropdown',
+                            options=[
+                                {'label': site, 'value': site} 
+                                for site in launch_sites_df['Launch Site']
+                            ],
+                            value=launch_sites_df['Launch Site'].iloc[0],
+                            placeholder="Select a Launch Site",
+                        )
+                    ],
+                    width=4
+                ),
+                dbc.Col(
+                    [
+                        html.Label("Date Range:"),
+                        dcc.DatePickerRange(
+                            id='date-range-picker',
+                            start_date=spacex_df['Date'].min().date(),
+                            end_date=spacex_df['Date'].max().date(),
+                            display_format='YYYY-MM-DD',
+                        )
+                    ],
+                    width=4
+                ),
+                dbc.Col(
+                    [
+                        html.Label("Launch Outcome:"),
+                        dcc.Checklist(
+                            id='launch-success-filter',
+                            options=[
+                                {'label': 'Success', 'value': 1},
+                                {'label': 'Failure', 'value': 0},
+                            ],
+                            value=[1, 0],
+                            inline=True
+                        )
+                    ],
+                    width=4
+                )
+            ],
+            className="mb-3"
+        ),
+
+        # Map and Details Section
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Iframe(
+                        id='launch-map',
+                        width='100%',
+                        height='600',
+                        style={'border': 'none'}
+                    ),
+                    width=8
+                ),
+                dbc.Col(
+                    [
+                        html.Div(
+                            id='distance-info',
+                            className="p-3 shadow-sm border rounded",
+                            style={'font-size': '16px'}
+                        )
+                    ],
+                    width=4
+                )
+            ]
+        )
     ],
     fluid=True,
-    className="mt-5"
+    className="p-4"
 )
-
 
 @app.callback(
     Output('launch-map', 'srcDoc'),
     Output('distance-info', 'children'),
-    Input('launch-site-dropdown', 'value')
+    Input('launch-site-dropdown', 'value'),
+    Input('launch-success-filter', 'value'),
+    Input('date-range-picker', 'start_date'),
+    Input('date-range-picker', 'end_date')
 )
-def update_map(selected_site):
-    # If no site is selected, display all launch sites
-    if selected_site is None:
-        # Create a Folium map centered on a default location (e.g., the center of all sites or an average location)
-        site_map = folium.Map(location=[launch_sites_df['Lat'].mean(), launch_sites_df['Long'].mean()], zoom_start=5)
+def update_map(selected_site, selected_status, start_date, end_date):
+    # Ensure the selected site is valid
+    if selected_site not in launch_sites_df['Launch Site'].values:
+        return "", "No valid site selected. Please select a valid launch site."
+
+    # Filter data based on success/failure and date range
+    filtered_df = spacex_df[
+        (spacex_df['Launch Site'] == selected_site) &
+        (spacex_df['class'].isin(selected_status)) &
+        (spacex_df['Date'] >= start_date) &
+        (spacex_df['Date'] <= end_date)
+    ]
+    
+    # Get site information
+    site_info = launch_sites_df[launch_sites_df['Launch Site'] == selected_site].iloc[0]
+    site_coordinates = [site_info['Lat'], site_info['Long']]
+    
+    site_map = folium.Map(location=site_coordinates, zoom_start=10)
+    marker_cluster = MarkerCluster().add_to(site_map)
+
+    # Add markers for filtered launches with tooltips
+    for _, record in filtered_df.iterrows():
+        coordinate = [record['Lat'], record['Long']]
+        marker_color = 'green' if record['class'] == 1 else 'red'
         
-        # Add markers for all launch sites
-        marker_cluster = MarkerCluster().add_to(site_map)
-        for _, site_info in launch_sites_df.iterrows():
-            coordinate = [site_info['Lat'], site_info['Long']]
-            folium.Marker(
-                coordinate,
-                icon=folium.Icon(color='blue'),
-                popup=f"Launch Site: {site_info['Launch Site']}"
-            ).add_to(marker_cluster)
-
-        # No specific site selected, so no distance info
-        distance_info = "Select a launch site to see the distances to nearby points."
-    else:
-        # Filter data for the selected site
-        site_data = spacex_df[spacex_df['Launch Site'] == selected_site]
-        site_info = launch_sites_df[launch_sites_df['Launch Site'] == selected_site].iloc[0]
-        site_coordinates = [site_info['Lat'], site_info['Long']]
-
-        # Create a Folium map centered on the selected launch site
-        site_map = folium.Map(location=site_coordinates, zoom_start=10)
-        marker_cluster = MarkerCluster().add_to(site_map)
-
-        # Add markers for all launches (success/failure)
-        for _, record in site_data.iterrows():
-            coordinate = [record['Lat'], record['Long']]
-            marker_color = 'green' if record['class'] == 1 else 'red'
-            folium.Marker(
-                coordinate,
-                icon=folium.Icon(color=marker_color),
-                popup=f"Launch Outcome: {'Success' if record['class'] == 1 else 'Failure'}"
-            ).add_to(marker_cluster)
-
-        # Add main launch site marker
         folium.Marker(
-            site_coordinates,
+            coordinate,
+            icon=folium.Icon(color=marker_color),
+            popup=f"Launch Outcome: {'Success' if record['class'] == 1 else 'Failure'}<br>Launch Time: {record['Date']}",
+            tooltip=f"Launch {record['Launch Site']} - {'Success' if record['class'] == 1 else 'Failure'}"
+        ).add_to(marker_cluster)
+
+    # Add main launch site marker
+    folium.Marker(
+        site_coordinates,
+        icon=DivIcon(
+            icon_size=(20, 20),
+            icon_anchor=(0, 0),
+            html=f'<div style="font-size: 12px; color: #d35400;"><b>{selected_site}</b></div>'
+        ),
+        popup=f"Launch Site: {selected_site}"
+    ).add_to(site_map)
+
+    # Calculate and display distances to nearby points
+    nearby_points = {
+        'Railway': [28.57468, -80.65229],
+        'Highway': [28.52361, -80.64857],
+        'Coastline': [28.573255, -80.646895],
+        'City': [28.6129, -80.8074]  # Example city coordinate
+    }
+
+    distance_info = html.Div([
+        html.P(f"Distances from {selected_site}:")
+    ])
+    
+    for point, coord in nearby_points.items():
+        distance = calculate_distance(site_info['Lat'], site_info['Long'], coord[0], coord[1])
+        distance_info.children.append(html.P(f"{point}: {distance:.2f} km"))
+        folium.PolyLine([site_coordinates, coord], color='blue').add_to(site_map)
+        folium.Marker(
+            coord,
             icon=DivIcon(
                 icon_size=(20, 20),
                 icon_anchor=(0, 0),
-                html=f'<div style="font-size: 12px; color: #d35400;"><b>{selected_site}</b></div>'
+                html=f'<div style="font-size: 12px; color: #d35400;"><b>{distance:.2f} km</b></div>'
             ),
-            popup=f"Launch Site: {selected_site}"
+            popup=f"{point}: {distance:.2f} km"
         ).add_to(site_map)
-
-        # Calculate and display distances to nearby points of interest
-        nearby_points = {
-            'Railway': [28.57468, -80.65229],
-            'Highway': [28.52361, -80.64857],
-            'Coastline': [28.573255, -80.646895],
-            'City': [28.6129, -80.8074]  # Example city coordinate
-        }
-
-        distance_info = "Distances from Launch Site:<br>"
-        for point, coord in nearby_points.items():
-            distance = calculate_distance(site_info['Lat'], site_info['Long'], coord[0], coord[1])
-            distance_info += f"{point}: {distance:.2f} km<br>"
-            # Add a line and marker for the point
-            folium.PolyLine([site_coordinates, coord], color='blue').add_to(site_map)
-            folium.Marker(
-                coord,
-                icon=DivIcon(
-                    icon_size=(20, 20),
-                    icon_anchor=(0, 0),
-                    html=f'<div style="font-size: 12px; color: #d35400;"><b>{distance:.2f} km</b></div>'
-                ),
-                popup=f"{point}: {distance:.2f} km"
-            ).add_to(site_map)
 
     # Render map as HTML
     map_html = site_map._repr_html_()
 
     return map_html, distance_info
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)
