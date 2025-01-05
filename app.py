@@ -5,6 +5,7 @@ from sidebar import create_navibar
 from pages.about import create_about_content
 from pages.webscraping import layout as scraping_layout
 from pages.eda import layout as eda_layout 
+from pages.folium import layout as folium_layout
 
 app = Dash(
     __name__,
@@ -111,6 +112,8 @@ def display_page(pathname):
         return eda_layout
     elif pathname == "/scraping":
         return scraping_layout
+    elif pathname == "/folium":
+        return folium_layout
     elif pathname == "/about":
         return create_about_content()
     else:

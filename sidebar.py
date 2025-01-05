@@ -21,6 +21,7 @@ def create_navibar():
                         [
                             dbc.NavItem(dbc.NavLink("EDA", href="/", className="nav-link", style={"color": "#343a40"})),
                             dbc.NavItem(dbc.NavLink("Webscraping", href="/scraping", className="nav-link", style={"color": "#343a40"})),
+                            dbc.NavItem(dbc.NavLink("Interactive Map", href="/folium", className="nav-link", style={"color": "#343a40"})),
                             dbc.NavItem(dbc.NavLink("About", href="#", className="nav-link", id="about-link", style={"color": "#343a40"})),
                             # Dropdown Menu Example
                             dbc.DropdownMenu(
