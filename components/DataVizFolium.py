@@ -35,98 +35,145 @@ app = DashProxy(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = dbc.Container(
     [
-        # Header Section
-        dbc.Row(
-            dbc.Col(
-                dbc.Card(
-                    dbc.CardBody(
-                        html.H1(
-                            "SpaceX Launch Sites Interactive Map",
-                            className="text-center text-primary mb-4"
-                        )
-                    ),
-                    className="shadow mb-3"
-                )
-            )
-        ),
+          # Header Section
+          dbc.Row(
+               dbc.Col(
+                    dbc.Card(
+                         dbc.CardBody(
+                              html.H1(
+                                   "SpaceX Launch Sites Interactive Map",
+                                   className="text-center text-primary mb-4"
+                              )
+                         ),
+                         className="shadow mb-3"
+                    )
+               )
+          ),
 
-        # Filters Section
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        html.Label("Launch Site:"),
-                        dcc.Dropdown(
-                            id='launch-site-dropdown',
-                            options=[
-                                {'label': site, 'value': site} 
-                                for site in launch_sites_df['Launch Site']
-                            ],
-                            value=launch_sites_df['Launch Site'].iloc[0],
-                            placeholder="Select a Launch Site",
-                        )
-                    ],
-                    width=4
-                ),
-                dbc.Col(
-                    [
-                        html.Label("Date Range:"),
-                        dcc.DatePickerRange(
-                            id='date-range-picker',
-                            start_date=spacex_df['Date'].min().date(),
-                            end_date=spacex_df['Date'].max().date(),
-                            display_format='YYYY-MM-DD',
-                        )
-                    ],
-                    width=4
-                ),
-                dbc.Col(
-                    [
-                        html.Label("Launch Outcome:"),
-                        dcc.Checklist(
-                            id='launch-success-filter',
-                            options=[
-                                {'label': 'Success', 'value': 1},
-                                {'label': 'Failure', 'value': 0},
-                            ],
-                            value=[1, 0],
-                            inline=True
-                        )
-                    ],
-                    width=4
-                )
-            ],
-            className="mb-3"
-        ),
-
-        # Map and Details Section
-        dbc.Row(
-            [
-                dbc.Col(
-                    html.Iframe(
-                        id='launch-map',
-                        width='100%',
-                        height='600',
-                        style={'border': 'none'}
+          # Filters Section
+          dbc.Row(
+               [
+                    dbc.Col(
+                         [
+                         html.Label("Launch Site:"),
+                         dcc.Dropdown(
+                              id='launch-site-dropdown',
+                              options=[
+                                   {'label': site, 'value': site} 
+                                   for site in launch_sites_df['Launch Site']
+                              ],
+                              value=launch_sites_df['Launch Site'].iloc[0],
+                              placeholder="Select a Launch Site",
+                         )
+                         ],
+                         width=4
                     ),
-                    width=8
-                ),
-                dbc.Col(
-                    [
-                        html.Div(
-                            id='distance-info',
-                            className="p-3 shadow-sm border rounded",
-                            style={'font-size': '16px'}
-                        )
-                    ],
-                    width=4
-                )
-            ]
-        )
+                    dbc.Col(
+                         [
+                         html.Label("Date Range:"),
+                         dcc.DatePickerRange(
+                              id='date-range-picker',
+                              start_date=spacex_df['Date'].min().date(),
+                              end_date=spacex_df['Date'].max().date(),
+                              display_format='YYYY-MM-DD',
+                         )
+                         ],
+                         width=4
+                    ),
+                    dbc.Col(
+                         [
+                         html.Label("Launch Outcome:"),
+                         dcc.Checklist(
+                              id='launch-success-filter',
+                              options=[
+                                   {'label': 'Success', 'value': 1},
+                                   {'label': 'Failure', 'value': 0},
+                              ],
+                              value=[1, 0],
+                              inline=True
+                         )
+                         ],
+                         width=4
+                    )
+               ],
+               className="mb-3"
+          ),
+
+          # Statistics Section
+          dbc.Row(
+               [
+                    dbc.Col(
+                         dbc.Card(
+                         dbc.CardBody(
+                              [
+                                   html.H4("Launch Statistics", className="card-title"),
+                                   html.Div(id='launch-stats', className="stats-container"),
+                              ]
+                         ),
+                         className="mb-4 shadow-sm"
+                         ),
+                         width=4
+                    )
+               ]
+          ),
+
+          # Map and Details Section
+          dbc.Row(
+               [
+                    dbc.Col(
+                         html.Iframe(
+                         id='launch-map',
+                         width='100%',
+                         height='600',
+                         style={'border': 'none'}
+                         ),
+                         width=8
+                    ),
+                    dbc.Col(
+                         [
+                         html.Div(
+                              id='distance-info',
+                              className="p-3 shadow-sm border rounded",
+                              style={'font-size': '16px'}
+                         )
+                         ],
+                         width=4
+                    )
+               ]
+          )
     ],
     fluid=True,
     className="p-4"
 )
+
+# Callback to update statistics dynamically
+@app.callback(
+    Output('launch-stats', 'children'),
+    Input('launch-site-dropdown', 'value'),
+    Input('launch-success-filter', 'value'),
+    Input('date-range-picker', 'start_date'),
+    Input('date-range-picker', 'end_date')
+)
+def update_stats(selected_site, selected_status, start_date, end_date):
+    # Filter data based on input
+    filtered_df = spacex_df[
+        (spacex_df['Launch Site'] == selected_site) &
+        (spacex_df['class'].isin(selected_status)) &
+        (spacex_df['Date'] >= start_date) &
+        (spacex_df['Date'] <= end_date)
+    ]
+
+    # Calculate stats
+    total_launches = len(filtered_df)
+    successful_launches = filtered_df['class'].sum()
+    success_rate = (successful_launches / total_launches * 100) if total_launches > 0 else 0
+
+    # Return stats
+    return [
+        html.P(f"Total Launches: {total_launches}"),
+        html.P(f"Successful Launches: {successful_launches}"),
+        html.P(f"Success Rate: {success_rate:.2f}%")
+    ]
 
 @app.callback(
     Output('launch-map', 'srcDoc'),
