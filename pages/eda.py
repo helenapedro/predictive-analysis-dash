@@ -5,7 +5,7 @@ import plotly.express as px
 import pandas as pd
 
 from pages.home import create_home_page
-from pages.data_exploration import fetch_and_process_data, create_exploration_page
+from pages.data_exploration import create_exploration_page
 from utils.queries import (
     fetch_unique_launch_sites, 
     fetch_launch_count, 
@@ -32,8 +32,6 @@ def create_section(title, graph_id, description, conclusions):
             ])
         ])
     ])
-
-rocket_df, launchpad_df, payload_df, core_df = fetch_and_process_data()
 
 layout = dbc.Container(
     [
@@ -275,7 +273,7 @@ layout = dbc.Container(
             ),
         ]),
 
-        create_exploration_page(rocket_df, launchpad_df, payload_df, core_df),
+        create_exploration_page(),
 
         # Footer
         html.Footer(

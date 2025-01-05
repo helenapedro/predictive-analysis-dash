@@ -1,6 +1,16 @@
 from dash import dcc, html, Input, Output, State, callback
 import dash_bootstrap_components as dbc
 
+# Import tabs
+from tabs.rockets_tab import rockets_tab
+from tabs.graphs_tab import payload_mass_distribution_tab
+from tabs.launch_tab import launch_tab
+from tabs.cores_tab import cores_tab
+from tabs.payloads_tab import payloads_tab
+from tabs.core_reuse_tab import cores_reuse_tab
+
+from data.data_fetch import fetch_and_process_data
+
 def eda_rest_api():
     return dbc.Card(
         [
@@ -28,16 +38,35 @@ def eda_rest_api():
                     dbc.Button(
                         "View/Hide Code Snippet",
                         id="toggle-api-button-summary",
-                        className="btn btn-primary",
+                        className="btn btn-primary mb-3",
                     ),
                     dcc.Markdown(id="api-summary-content", style={"display": "none"}),
                     dcc.Store(id="api-snippet-visible", data=False),  # Store for visibility state
                 ]
             ),
+
+            # Tabs Section
+            dbc.Row(
+                dbc.Col(
+                    dcc.Tabs(
+                        [
+                            rockets_tab(rockets_df),
+                            launch_tab(launchpads_df),
+                            payloads_tab(payloads_df),
+                            cores_tab(cores_df),
+                            payload_mass_distribution_tab(payloads_df),
+                            cores_reuse_tab(cores_df),
+                        ],
+                        className='custom-tabs',
+                        style={'border': '1px solid #dee2e6', 'borderRadius': '0.25rem'}
+                    )
+                )
+            )
         ],
         className="mb-4 shadow-sm",
     )
 
+rockets_df, launchpads_df, payloads_df, cores_df = fetch_and_process_data()
 
 @callback(
     [Output("api-summary-content", "children"), Output("api-summary-content", "style"), Output("api-snippet-visible", "data")],
