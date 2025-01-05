@@ -1,10 +1,10 @@
-import pandas as pd
+from dash_extensions.enrich import DashProxy, dcc, html, Output, Input  
+import dash_bootstrap_components as dbc
 import folium
-import os
 from folium.plugins import MarkerCluster
 from folium.features import DivIcon
-from dash import Dash, dcc, html, Input, Output
-from dash_extensions.enrich import DashProxy, Output, Input  
+import pandas as pd
+import os
 from math import sin, cos, sqrt, atan2, radians
 
 # Construct the absolute path to the CSV file
@@ -33,17 +33,90 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 # Initialize the Dash app
 app = DashProxy(__name__)
 
-app.layout = html.Div([
-    html.H1("SpaceX Launch Sites Interactive Map"),
-    dcc.Dropdown(
-        id='launch-site-dropdown',
-        options=[{'label': site, 'value': site} for site in launch_sites_df['Launch Site']],
-        value=launch_sites_df['Launch Site'].iloc[0],
-        placeholder="Select a Launch Site"
-    ),
-    html.Iframe(id='launch-map', width='100%', height='600'),
-    html.Div(id='distance-info', style={'margin-top': '20px', 'font-size': '16px'})
-])
+app.layout = dbc.Container(
+    [
+          dbc.Row(
+               dbc.Card(
+                    [
+                         dbc.CardHeader(
+                              html.H1(
+                                   "SpaceX Launch Sites Interactive Map",
+                                   className='text-center mb-4',
+                                   style={'color': '#4CAF50'}
+                              )  
+                         ),
+                         # Card to hold the dropdown and map
+                         dbc.Row(
+                              dbc.Col(
+                                   dbc.Card(
+                                        [
+                                        dbc.CardHeader(
+                                             html.H3("Select Launch Site", className="text-center"),
+                                        ),
+                                        dbc.CardBody(
+                                             [
+                                                  # Dropdown for selecting launch site
+                                                  dcc.Dropdown(
+                                                       id='launch-site-dropdown',
+                                                       options=[{'label': site, 'value': site} for site in launch_sites_df['Launch Site']],
+                                                       value=launch_sites_df['Launch Site'].iloc[0],
+                                                       placeholder="Select a Launch Site",
+                                                       style={'width': '100%', 'margin-bottom': '20px'}
+                                                  ),
+                                                  
+                                                  # Description or instructions
+                                                  html.Div(
+                                                       "Select a launch site to view its launch history and nearby distances.",
+                                                       id="map-description",
+                                                       style={'font-size': '16px', 'margin-bottom': '20px'}
+                                                  ),
+                                                  
+                                                  # Iframe to display the map
+                                                  html.Iframe(
+                                                       id='launch-map',
+                                                       width='100%',
+                                                       height='600',
+                                                       style={'border': 'none'}
+                                                  ),
+                                                  
+                                                  # Distance information
+                                                  html.Div(
+                                                       id='distance-info',
+                                                       style={'font-size': '16px', 'margin-top': '20px'}
+                                                  )
+                                             ]
+                                        ),
+                                        ],
+                                        className="mb-4 shadow"
+                                   )
+                              )
+                         ),
+                    ],
+                    className="mb-4 shadow"
+               )
+          ),
+        # Footer with additional links or information
+        dbc.Row(
+            dbc.Col(
+                html.Footer(
+                    [
+                        html.P("@2021, Helena Pedro", className='text-center text-muted'),
+                        html.Div(
+                            [
+                                html.A("GitHub", href="https://github.com/helenapedro", className='me-3'),
+                            ],
+                            className="text-center"
+                        ),
+                    ],
+                    className='mt-5'
+                )
+            )
+        ),
+    ],
+    fluid=True,
+    className="mt-5"
+)
+
 
 @app.callback(
     Output('launch-map', 'srcDoc'),
