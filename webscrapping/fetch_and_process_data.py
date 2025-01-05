@@ -22,7 +22,6 @@ def fetch_falcon_9_launch_data():
 
     # Create dictionary to hold the scraped data, initializing with empty lists
     launch_dict = {name: [] for name in column_names}
-    launch_dict['Flight No.'] = []
     launch_dict['Launch site'] = []
     launch_dict['Payload'] = []
     launch_dict['Payload mass'] = []
@@ -77,7 +76,7 @@ def fetch_falcon_9_launch_data():
     df = pd.DataFrame(launch_dict)
 
     # Return only the relevant columns
-    df = df[['Flight No.', 'Date', 'Time', 'Launch site', 'Payload', 'Payload mass', 'Orbit', 'Customer', 'Launch outcome', 'Version Booster', 'Booster landing']]
+    df = df[['Date', 'Time', 'Launch site', 'Payload', 'Payload mass', 'Orbit', 'Customer', 'Launch outcome', 'Version Booster', 'Booster landing']]
 
     return df
 
