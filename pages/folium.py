@@ -119,12 +119,12 @@ layout = dbc.Container(
                    [
                          dbc.Card([
                               dbc.CardBody([
-                              html.Iframe(
-                                   id='launch-map',
-                                   width='100%',
-                                   height='800',
-                                   style={'border': 'none'}
-                              )
+                                   html.Iframe(
+                                        id='launch-map',
+                                        width='100%',
+                                        height='800',
+                                        style={'border': 'none'}
+                                   )
                               ])
                          ], className="mb-4 shadow-lg hoverable")
                     ],
