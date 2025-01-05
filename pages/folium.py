@@ -57,72 +57,79 @@ layout = dbc.Container(
                )
           ),
 
-        # Filters and Statistics
-        dbc.Row([
-               dbc.Col([
-                    dbc.Card([
-                         dbc.CardBody([
-                              html.Label("Select a launch site:", id="launch-site-label"),
-                              dcc.Dropdown(
-                                   id='launch-site-dropdown',
-                                   options=[{'label': site, 'value': site} for site in launch_sites_df['Launch Site']],
-                                   value=launch_sites_df['Launch Site'].iloc[0],
-                                   placeholder="Select a Launch Site",
-                                   className="mb-2"
-                              ),
-                              dbc.Tooltip("Select a SpaceX launch site to filter launches.", target="launch-site-label"),
-                              dcc.Checklist(
-                                   id='launch-success-filter',
-                                   options=[
-                                        {'label': 'Success', 'value': 1},
-                                        {'label': 'Failure', 'value': 0}
-                                   ],
-                                   value=[1, 0],
-                                   inline=True,
-                                   style={'margin-bottom': '20px'}
-                              ),
-                              dcc.DatePickerRange(
-                                   id='date-range-picker',
-                                   start_date=spacex_df['Date'].min().date(),
-                                   end_date=spacex_df['Date'].max().date(),
-                                   display_format='YYYY-MM-DD',
-                                   style={'width': '100%'}
-                              ),
+          # Filters and Statistics
+          dbc.Row([
+                    dbc.Col([
+                         dbc.Card([
+                              dbc.CardBody([
+                                   html.Label("Select a launch site:", id="launch-site-label"),
+                                   dcc.Dropdown(
+                                        id='launch-site-dropdown',
+                                        options=[{'label': site, 'value': site} for site in launch_sites_df['Launch Site']],
+                                        value=launch_sites_df['Launch Site'].iloc[0],
+                                        placeholder="Select a Launch Site",
+                                        className="mb-2"
+                                   ),
+                                   dbc.Tooltip("Select a SpaceX launch site to filter launches.", target="launch-site-label"),
+                                   dcc.Checklist(
+                                        id='launch-success-filter',
+                                        options=[
+                                             {'label': 'Success', 'value': 1},
+                                             {'label': 'Failure', 'value': 0}
+                                        ],
+                                        value=[1, 0],
+                                        inline=True,
+                                        style={'margin-bottom': '20px'}
+                                   ),
+                                   dcc.DatePickerRange(
+                                        id='date-range-picker',
+                                        start_date=spacex_df['Date'].min().date(),
+                                        end_date=spacex_df['Date'].max().date(),
+                                        display_format='YYYY-MM-DD',
+                                        style={'width': '100%'}
+                                   ),
 
-                              dcc.Checklist(
-                                   id='map-type-toggle',
-                                   options=[{'label': 'Show Heatmap', 'value': 'heatmap'}],
-                                   value=[]
+                                   dcc.Checklist(
+                                        id='map-type-toggle',
+                                        options=[{'label': 'Show Heatmap', 'value': 'heatmap'}],
+                                        value=[]
+                                   )
+
+                              ])
+                         ], className="mb-4 shadow-lg hoverable")
+                    ], 
+                    xs=12, sm=12, md=6, lg=6, xl=6
+               ),
+
+               dbc.Col(
+                   [
+                         dbc.Card([
+                              dbc.CardBody([
+                              html.Div(id='launch-stats', className="stats-container"),
+                              ])
+                         ], className="mb-4 shadow-sm")
+                    ], 
+                    xs=12, sm=12, md=6, lg=6, xl=6
+               )
+          ]),
+
+          # Map Section
+          dbc.Row([
+               dbc.Col(
+                   [
+                         dbc.Card([
+                              dbc.CardBody([
+                              html.Iframe(
+                                   id='launch-map',
+                                   width='100%',
+                                   height='800',
+                                   style={'border': 'none'}
                               )
-
-                         ])
-                    ], className="mb-4 shadow-lg hoverable")
-               ], width=8),
-
-            dbc.Col([
-                dbc.Card([
-                    dbc.CardBody([
-                        html.Div(id='launch-stats', className="stats-container"),
-                    ])
-                ], className="mb-4 shadow-sm")
-            ], width=4)
-        ]),
-
-        # Map Section
-        dbc.Row([
-            dbc.Col([
-                dbc.Card([
-                    dbc.CardBody([
-                        html.Iframe(
-                            id='launch-map',
-                            width='100%',
-                            height='800',
-                            style={'border': 'none'}
-                        )
-                    ])
-                ], className="mb-4 shadow-lg hoverable")
-            ])
-        ])
+                              ])
+                         ], className="mb-4 shadow-lg hoverable")
+                    ],
+               )
+          ])
     ],
     fluid=True,
     className="mt-5"
