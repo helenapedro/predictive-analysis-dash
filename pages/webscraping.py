@@ -39,7 +39,8 @@ layout = dbc.Container(
                                         id="table-container", 
                                         className="mt-4"
                                     )
-                                ),  # Empty initially, filled after data fetch
+                                ),  
+                                # Empty initially, filled after data fetch
                                 dcc.Download(id="download-dataframe-csv")
                             ]
                         )
