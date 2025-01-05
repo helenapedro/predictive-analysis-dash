@@ -1,15 +1,18 @@
 import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output
+from dash import html, Input, Output
+import os
 import pandas as pd
 import folium
 from folium.plugins import MarkerCluster, MousePosition
 from folium.features import DivIcon
 from math import sin, cos, sqrt, atan2, radians
-import os
+
+# Construct the absolute path to the CSV file
+base_dir = os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.join(base_dir, '../data/spacex_launch_geo.csv')
 
 # Load data
-spacex_df = pd.read_csv('csv/spacex_launch_geo.csv')
+spacex_df = pd.read_csv(data_path)
 spacex_df['marker_color'] = spacex_df['class'].apply(lambda x: 'green' if x == 1 else 'red')
 launch_sites_df = spacex_df.groupby(['Launch Site'], as_index=False).first()[['Launch Site', 'Lat', 'Long']]
 
