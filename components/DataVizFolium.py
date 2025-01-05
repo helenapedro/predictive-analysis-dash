@@ -36,63 +36,74 @@ app = DashProxy(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = dbc.Container(
     [
-        # Header Section
-        dbc.Row([
-            dbc.Col(
-                dbc.Card([
-                    dbc.CardHeader(
-                        html.H1(
-                            "SpaceX Launch Sites Interactive Map",
-                            className="text-center mb-4",
-                            style={'color': '#4CAF50'}
-                        ),
+          # Hero Section
+          dbc.Row(
+               dbc.Col(
+                    dbc.Card(
+                         dbc.CardBody([
+                              html.H1(
+                                   "SpaceX Launch Sites Interactive Map",
+                                   className="text-center",
+                                   style={'color': '#4CAF50'}
+                              ),
+                              html.P(
+                                   "Explore SpaceX launch sites, analyze past launches, and visualize successes and failures on an interactive map. "
+                                   "Use filters to customize your view and gain insights into SpaceX's incredible achievements.",
+                                   className="text-center text-muted",
+                                   style={"font-size": "18px"}
+                              )
+                         ]),
+                         className="mb-4 shadow"
                     ),
-                    html.Div([
-                        html.P("Filter and Information", className='text-center text-muted'),
-                    ], className="hero-section")
-                ])
-            )
-        ]),
+                    width=12
+               )
+          ),
 
         # Filters and Statistics
         dbc.Row([
-            dbc.Col([
-                dbc.Card([
-                    dbc.CardBody([
-                        html.Label("Select a launch site:", id="launch-site-label"),
-                        dcc.Dropdown(
-                            id='launch-site-dropdown',
-                            options=[{'label': site, 'value': site} for site in launch_sites_df['Launch Site']],
-                            value=launch_sites_df['Launch Site'].iloc[0],
-                            placeholder="Select a Launch Site",
-                            className="mb-2"
-                        ),
-                        dbc.Tooltip("Select a SpaceX launch site to filter launches.", target="launch-site-label"),
-                        dcc.Checklist(
-                            id='launch-success-filter',
-                            options=[
-                                {'label': 'Success', 'value': 1},
-                                {'label': 'Failure', 'value': 0}
-                            ],
-                            value=[1, 0],
-                            inline=True,
-                            style={'margin-bottom': '20px'}
-                        ),
-                        dcc.DatePickerRange(
-                            id='date-range-picker',
-                            start_date=spacex_df['Date'].min().date(),
-                            end_date=spacex_df['Date'].max().date(),
-                            display_format='YYYY-MM-DD',
-                            style={'width': '100%'}
-                        ),
-                    ])
-                ], className="mb-4 shadow-lg hoverable")
-            ], width=8),
+               dbc.Col([
+                    dbc.Card([
+                         dbc.CardBody([
+                              html.Label("Select a launch site:", id="launch-site-label"),
+                              dcc.Dropdown(
+                                   id='launch-site-dropdown',
+                                   options=[{'label': site, 'value': site} for site in launch_sites_df['Launch Site']],
+                                   value=launch_sites_df['Launch Site'].iloc[0],
+                                   placeholder="Select a Launch Site",
+                                   className="mb-2"
+                              ),
+                              dbc.Tooltip("Select a SpaceX launch site to filter launches.", target="launch-site-label"),
+                              dcc.Checklist(
+                                   id='launch-success-filter',
+                                   options=[
+                                        {'label': 'Success', 'value': 1},
+                                        {'label': 'Failure', 'value': 0}
+                                   ],
+                                   value=[1, 0],
+                                   inline=True,
+                                   style={'margin-bottom': '20px'}
+                              ),
+                              dcc.DatePickerRange(
+                                   id='date-range-picker',
+                                   start_date=spacex_df['Date'].min().date(),
+                                   end_date=spacex_df['Date'].max().date(),
+                                   display_format='YYYY-MM-DD',
+                                   style={'width': '100%'}
+                              ),
+
+                              dcc.Checklist(
+                                   id='map-type-toggle',
+                                   options=[{'label': 'Show Heatmap', 'value': 'heatmap'}],
+                                   value=[]
+                              )
+
+                         ])
+                    ], className="mb-4 shadow-lg hoverable")
+               ], width=8),
 
             dbc.Col([
                 dbc.Card([
                     dbc.CardBody([
-                        html.H4("Launch Statistics", className="card-title"),
                         html.Div(id='launch-stats', className="stats-container"),
                     ])
                 ], className="mb-4 shadow-sm")
@@ -128,14 +139,23 @@ app.layout = dbc.Container(
         Input('launch-site-dropdown', 'value'),
         Input('launch-success-filter', 'value'),
         Input('date-range-picker', 'start_date'),
-        Input('date-range-picker', 'end_date')
+        Input('date-range-picker', 'end_date'),
+        Input('map-type-toggle', 'value')  # Include map-type-toggle as an input
     ]
 )
-def update_map_and_stats(selected_site, selected_status, start_date, end_date):
+def update_map_and_stats(selected_site, selected_status, start_date, end_date, map_type_toggle):
     # Ensure the selected site is valid
     if selected_site not in launch_sites_df['Launch Site'].values:
         error_message = html.Div(
             "No valid site selected. Please select a valid launch site.",
+            style={'color': 'red'}
+        )
+        return "", error_message
+
+    # Validate date range
+    if pd.to_datetime(start_date) > pd.to_datetime(end_date):
+        error_message = html.Div(
+            "Invalid date range. The start date must be earlier than the end date.",
             style={'color': 'red'}
         )
         return "", error_message
@@ -148,22 +168,35 @@ def update_map_and_stats(selected_site, selected_status, start_date, end_date):
         (spacex_df['Date'] <= end_date)
     ]
 
+    if filtered_df.empty:
+        error_message = html.Div(
+            f"No launches found for {selected_site} with the selected filters.",
+            style={'color': 'red'}
+        )
+        return "", error_message
+
     # Map generation
     site_info = launch_sites_df[launch_sites_df['Launch Site'] == selected_site].iloc[0]
     site_coordinates = [site_info['Lat'], site_info['Long']]
     site_map = folium.Map(location=site_coordinates, zoom_start=10)
-    marker_cluster = MarkerCluster().add_to(site_map)
 
-    for _, record in filtered_df.iterrows():
-        coordinate = [record['Lat'], record['Long']]
-        marker_color = 'green' if record['class'] == 1 else 'red'
+    if 'heatmap' in map_type_toggle:
+        # Add heatmap
+        heat_data = [[row['Lat'], row['Long']] for _, row in filtered_df.iterrows()]
+        HeatMap(heat_data).add_to(site_map)
+    else:
+        # Add markers
+        marker_cluster = MarkerCluster().add_to(site_map)
+        for _, record in filtered_df.iterrows():
+            coordinate = [record['Lat'], record['Long']]
+            marker_color = 'green' if record['class'] == 1 else 'red'
 
-        folium.Marker(
-            coordinate,
-            icon=folium.Icon(color=marker_color),
-            popup=f"Launch Outcome: {'Success' if record['class'] == 1 else 'Failure'}<br>Launch Time: {record['Date']}",
-            tooltip=f"Launch {record['Launch Site']} - {'Success' if record['class'] == 1 else 'Failure'}"
-        ).add_to(marker_cluster)
+            folium.Marker(
+                coordinate,
+                icon=folium.Icon(color=marker_color),
+                popup=f"Launch Outcome: {'Success' if record['class'] == 1 else 'Failure'}<br>Launch Time: {record['Date']}",
+                tooltip=f"Launch {record['Launch Site']} - {'Success' if record['class'] == 1 else 'Failure'}"
+            ).add_to(marker_cluster)
 
     # Add main launch site marker
     folium.Marker(
@@ -192,6 +225,7 @@ def update_map_and_stats(selected_site, selected_status, start_date, end_date):
     map_html = site_map._repr_html_()
 
     return map_html, stats_content
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
